@@ -47,6 +47,7 @@ class GameWorld:
     vX = 0  # Velocity of X direction.
     vY = 0  # Velocity of Y direction.
     
+    bubbleStack = []
     bubblesOnBoard = [[]]    # Bubbles that already exist in the game world. (fieldArray)
     connectedBubbles = [[]]  # 2D Array that is part of checkBubbleChain method for bubble. 
                              #Extends to the size of a bubble chain of the same color and contains row,col position. (chainArray)
@@ -90,7 +91,7 @@ class GameScreen:
 
     def redraw(self):
         self.borderLine()
-        self.loadBubbles(self.bubblesOnBoard)
+        self.drawBubbles()
         cannon.redraw()
 
     # getCannon: Returns cannon of GameScreen. Not necessary anymore but still implemented.
@@ -104,7 +105,11 @@ class GameScreen:
         self.borderY = screenY
         pygame.draw.line(screen, self.lineColor, (self.borderX, 0), (self.borderX, screenY), 5) # Thinking about changing this somehow. Make it more general.
         
+    def drawBubbles(self):
+        for bubble in GameWorld.bubbleStack:
+            pygame.draw.circle(screen, bubble.bubbleColor, (bubble.getPosX(bubble.row), int(bubble.getPosY(bubble.col))), RADIUS)
 
+            
         
     # loadBubbles: Loads and draws the first 7 rows of the GameScreen. Also clears connectedBubble array and checks for a new chain of bubbles (this can be turned into a small method
     # to clean it up). 
@@ -117,7 +122,7 @@ class GameScreen:
                 if(row % 2 == 0):
                     if(row < 8 and self.bubblesOnBoard[row][col] > 0): # If inbounds and the bubble exists (>0).
                         bubble = Bubble(bubblesOnBoard[row][col], row, col)
-                        pygame.draw.circle(screen, bubble.bubbleColor, (bubble.getPosX(row), int(bubble.getPosY(col))), RADIUS)
+                        GameWorld.bubbleStack.append(bubble)
                         GameWorld.connectedBubbles = []  # Reset list to find new bubble chains. (6/25/14) This and below line can be turned into new chain method.
                         Bubble.checkBubbleChain(bubble, row, col, bubblesOnBoard)
                     
@@ -126,10 +131,12 @@ class GameScreen:
                     if(col < COLUMNS_ODD):
                         if(row < 8 and self.bubblesOnBoard[row][col] > 0): # If inbounds and the bubble exists (>0).
                             bubble = Bubble(bubblesOnBoard[row][col], row, col)
-                            pygame.draw.circle(screen, bubble.bubbleColor, (bubble.getPosX(row), int(bubble.getPosY(col))), RADIUS)
+                            GameWorld.bubbleStack.append(bubble)
+#                             pygame.draw.circle(screen, bubble.bubbleColor, (bubble.getPosX(row), int(bubble.getPosY(col))), RADIUS)
                             GameWorld.connectedBubbles = []  # Reset list to find new bubble chains. (6/25/14) This and below line can be turned into new chain method.
                             Bubble.checkBubbleChain(bubble, row, col, bubblesOnBoard)
-
+        print GameWorld.bubbleStack.__len__()
+        
 # CANNON CLASS: Represents a cannon that can rotate which adjusts trajectory of a bubble. Not much implemented yet. TODO: better graphic, and working rotation methods.
 class Cannon:
     def __init__(self):
@@ -143,8 +150,16 @@ class Cannon:
         pygame.draw.arc(screen, self.cannonColor, self.rectangle, self.startRadian, self.endRadian, 3)
     
     def redraw(self):
+#         self.loadCannon() # Check if cannon needs to be loaded
         pygame.draw.arc(screen, self.cannonColor, self.rectangle, self.startRadian, self.endRadian, 3)
 
+#     def loadCannon(self):
+#         if(bubblesParked()):
+#             self.addBubble()
+#     
+#     def addBubble(self):
+#         bubbleNew = Bubble(0, 0, 0) # Make new bubble.
+#         bubbleNew.cannonBubble() # Adjust bubble for cannon.
     
     # Rotate the cannon to the left at current ROTATION_SPEED.
     def rotateLeft(self, move):
@@ -170,19 +185,30 @@ class Bubble:
         self.bubbleColor = self.pickColor(bubbleColor)
         self.row = row
         self.col = col
+        self.posX = 0
+        self.posY = 0
+
+#     def cannonBubble(self):
+#         self.bubbleColor = self.randomColor()
+#         self.posX = RADIUS*8 + RADIUS # Temp Coordinates -- Pretty sure wrong (7/2/2014)
+#         self.posY = 450-RADIUS
 
         # Added position methods for the bubble class (6/25/2014)
     def getPosX(self, col):
         if(self.row % 2 == 0):
-            return RADIUS + self.col * RADIUS * 2;
+            posX = RADIUS + self.col * RADIUS * 2;
+            return posX
         else:
-            return 2 * RADIUS + self.col * RADIUS * 2
+            posX = 2 * RADIUS + self.col * RADIUS * 2
+            return posX
             
     def getPosY(self, row):
         if(self.row % 2 == 0):
-            return RADIUS + self.row * DISTANCE;
+            posY = RADIUS + self.row * DISTANCE;
+            return posY
         else:
-            return RADIUS + self.row * DISTANCE       
+            posY = RADIUS + self.row * DISTANCE       
+            return posY
 
     def randomColor(self):
         bubbleCase = randrange(5)
