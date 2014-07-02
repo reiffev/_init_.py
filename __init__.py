@@ -269,53 +269,52 @@ class Bubble:
             return -1   
         return bubblesOnBoard[row][col]
 
-def mainloop():
-    # Initialize the game
-    pygame.init()
+# Initialize the game
+pygame.init()
+
+# Build screen
+screen = pygame.display.set_mode((screenX, screenY), 0, 32)
+backgroundColor = (0,0,0)
+
+clock = pygame.time.Clock()
+gameWorld = GameWorld()
+gameScreen = GameScreen(gameWorld, screen)  # Class to build screen/play board.
+cannon = gameScreen.getCannon()
+
+gameRunning = True
+
+while gameRunning:
+    delta_Time = clock.tick(30)  # 30 Frames per second?
     
-    # Build screen
-    screen = pygame.display.set_mode((screenX, screenY), 0, 32)
-    backgroundColor = (0,0,0)
+    screen.fill(backgroundColor)
+    gameScreen.redraw()
     
-    clock = pygame.time.Clock()
-    gameWorld = GameWorld()
-    gameScreen = GameScreen(gameWorld, screen)  # Class to build screen/play board.
-    cannon = gameScreen.getCannon()
+    # CHECKS FOR ALREADY PRESSED KEYS
+    keys_pressed = pygame.key.get_pressed()
+    if keys_pressed[K_RIGHT]:
+        cannon.rotateRight(True)
+    if keys_pressed[K_LEFT]:
+        cannon.rotateLeft(True)
     
-    gameRunning = True
-    
-    while gameRunning:
-        delta_Time = clock.tick(30)  # 30 Frames per second?
+    # CHECKS FOR KEYS NEWLY PRESSED/UNPRESSED
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+            sys.exit()
+        elif event.type == KEYDOWN:
+            if event.key == pygame.K_UP:  # Fire a bubble.
+                print "fire"
+            if event.key == pygame.K_LEFT:  # Move cannon left.
+                cannon.rotateLeft(True)
+            elif event.key == pygame.K_RIGHT:  # Move cannon right.
+                cannon.rotateRight(True)
+        elif event.type == KEYUP:
+            if event.key == pygame.K_LEFT: 
+                cannon.rotateLeft(False)
+            elif event.key == pygame.K_RIGHT:
+                cannon.rotateRight(False)
+
+    pygame.display.update()
+
         
-        screen.fill(backgroundColor)
-        gameScreen.redraw()
-        
-        # CHECKS FOR ALREADY PRESSED KEYS
-        keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[K_RIGHT]:
-            cannon.rotateRight(True)
-        if keys_pressed[K_LEFT]:
-            cannon.rotateLeft(True)
-        
-        # CHECKS FOR KEYS NEWLY PRESSED/UNPRESSED
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                pygame.quit()
-                sys.exit()
-            elif event.type == KEYDOWN:
-                if event.key == pygame.K_UP:  # Fire a bubble.
-                    print "fire"
-                if event.key == pygame.K_LEFT:  # Move cannon left.
-                    cannon.rotateLeft(True)
-                elif event.key == pygame.K_RIGHT:  # Move cannon right.
-                    cannon.rotateRight(True)
-            elif event.type == KEYUP:
-                if event.key == pygame.K_LEFT: 
-                    cannon.rotateLeft(False)
-                elif event.key == pygame.K_RIGHT:
-                    cannon.rotateRight(False)
-    
-        pygame.display.update()
-    
-            
