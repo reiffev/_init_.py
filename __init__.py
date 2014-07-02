@@ -6,7 +6,7 @@ Created on May 30, 2014
 
 
 '''
-NOTES UPDATED 7/1/2014
+NOTES UPDATED 7/2/2014
 Alex's Notes
     (7/1/2014)
     - Comments added up until the bubble class. Some noted TODO are getting the rotation of cannon to work, better cannon graphic, and learning/implementing pygame sprites..and more.
@@ -20,7 +20,8 @@ Alex's Notes
     - Let me know if you have any questions
     
 Evan's Notes
-    - 
+	(7/2/2014)
+    - Noticed that, at least in the console window, you can move the cannon and fire at the same time
 '''
 
 import pygame, sys
