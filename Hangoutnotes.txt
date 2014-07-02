@@ -1,0 +1,74 @@
+Testing 
+
+
+
+
+Evan Update 
+ 
+Getting init to work 
+Have everything in video from piazza 
+
+
+Nothing shows up 
+
+
+Through TextWrangler
+Traceback (most recent call last):
+  File "/Users/reiffev/Desktop/Game.py", line 1, in <module>
+    import pygame, sys, math
+ImportError: No module named pygame
+logout
+
+
+Just through Terminal
+Warning once: This application, or a library it uses, is using NSQuickDrawView, which has been deprecated. Apps should cease use of QuickDraw and move to Quartz.
+Jun  8 19:13:34 evans-mbp.home Python[13196] <Error>: The function `CGSFlushWindow' is obsolete and will be removed in an upcoming update. Unfortunately, this application, or a library it uses, is using this obsolete function, and is thereby contributing to an overall degradation of system performance. Please use `CGSFlushWindowContentRegion' instead.
+The window shows up with this one
+
+
+Explanation of with keyword
+
+
+http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/statements.html#with
+
+
+
+
+Update 
+ 
+Use Sully’s alienshooter.py file for our base file 
+
+
+I need to email about sensors and software 
+
+
+Things that aren’t working/need to be added
+
+
+Connected components (recursive function) 
+
+
+getChain 
+getConnections 
+removeNotConnected 
+
+
+Github Repository 
+ 
+Evan start a repository for new base file 
+That will be the code that Evan and Alex will be working on until we commit to master 
+
+
+06/23 
+
+
+Base working version - basic functionality working (in terms of connecting and disappearing bubbles) 
+
+
+Research into efficiently using Github (Mac side) 
+
+
+Alex - take notes for what you do from Windows 
+
+
+Tentatively 06/22 Hangout to see where we stand
