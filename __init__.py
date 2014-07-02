@@ -156,6 +156,10 @@ class Cannon:
         self.endRadian = 2*pi
         pygame.draw.arc(screen, self.cannonColor, self.rectangle, self.startRadian, self.endRadian,3)
     
+    def draw(self):
+        pygame.draw.arc(screen, self.cannonColor, self.rectangle, self.startRadian, self.endRadian,3)
+
+    
     def rotateLeft(self, move):
         if( move == True ):
             print True
@@ -165,8 +169,10 @@ class Cannon:
     def rotateRight(self, move):
         if( move == True):
             self.startRadian -= ROTATION_SPEED
-        else:
             self.endRadian += ROTATION_SPEED
+        else:
+            return
+
 
 class Bubble:
     radius = RADIUS
@@ -307,7 +313,7 @@ while gameRunning:
                 cannon.rotateLeft(False)
             elif event.key == pygame.K_RIGHT:
                 cannon.rotateRight(False)
-    
+    cannon.draw()
     pygame.display.update()
 
 
