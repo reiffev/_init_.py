@@ -6,7 +6,7 @@ Created on May 30, 2014
 
 
 '''
-NOTES UPDATED 7/2/2014
+NOTES UPDATED 7/3/2014
 Alex's Notes
     (7/2/2014)
     - Working on firing bubble. Current problem is accessing the bubbleStack list. When I try to pop/get the bubble to be fired it says that it
@@ -26,8 +26,9 @@ Alex's Notes
     - Let me know if you have any questions
     
 Evan's Notes
-	(7/2/2014)
-    - Noticed that, at least in the console window, you can move the cannon and fire at the same time
+	(7/3/2014)
+    - Noticed that, at least in the console window, you can move the cannon and fire at the same time. It will be easier to see when we actually have a bubble firing
+    	- Checked with the old game. This doesn't matter because once up is pressed, the ball is fired and another one won't be loaded.
 '''
 
 import pygame, sys
