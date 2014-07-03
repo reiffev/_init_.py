@@ -368,11 +368,9 @@ while gameRunning:
         elif event.type == KEYDOWN:
             if event.key == pygame.K_UP:  # Fire a bubble.
                 print "fire"
-<<<<<<< HEAD
                 gameScreen.fireBubble()
             if event.key == pygame.K_LEFT:  # Move cannon left.
                 cannon.rotateLeft(True)
-=======
                 FIRE = True
                 print "True"
             elif event.key == pygame.K_LEFT: # Move cannon left.
@@ -382,7 +380,6 @@ while gameRunning:
             	else:
             		cannon.rotateLeft(False)
             	print "FIRE = %f" % FIRE
->>>>>>> 160aae13bc0e5a0f994176cfe260ad007294d391
             elif event.key == pygame.K_RIGHT:  # Move cannon right.
             	print "FIRE = %f" % FIRE
             	if FIRE == False:
