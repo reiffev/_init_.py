@@ -29,6 +29,9 @@ Evan's Notes
 	(7/3/2014)
     - Noticed that, at least in the console window, you can move the cannon and fire at the same time. It will be easier to see when we actually have a bubble firing
     	- Checked with the old game. This doesn't matter because once up is pressed, the ball is fired and another one won't be loaded.
+    (7/3/2014)
+    - Before firing the bubble, a little calculation needs to be done. I believe that that angle of the open sector of the cannon is pi/2 to start, then either adding or subtracting
+    DEG_TO_RAD depending on turning the cannon left or right
 '''
 
 import pygame, sys
@@ -47,6 +50,7 @@ COLUMNS_EVEN = 8
 TOTAL_COLUMNS = COLUMNS_ODD + COLUMNS_EVEN
 screenX, screenY = 640, 480
 DEG_TO_RAD = 0.0174532925
+FIRE = False
 
 # CLASS GAMEWORLD: Holds the values of the ongoing game including the current level, timer, score.
 # Class currently is not being fully utilized. A temporary "test" level is being used in the GameScreen class.
@@ -171,6 +175,7 @@ class Cannon:
         self.endRadian = 2 * pi
         self.maxRight = 2.094395102 # 4PI/6
         self.maxLeft = 4.188790205  # 8PI/6
+        self.angle = 1.570796317    # PI/2
         pygame.draw.arc(screen, self.cannonColor, self.rectangle, self.startRadian, self.endRadian, 3)
     
     def redraw(self):
@@ -191,20 +196,27 @@ class Cannon:
 
     # Rotate the cannon to the left at current ROTATION_SPEED.
     def rotateLeft(self, move):
+    	#print "START %s" % self.startRadian
+    	#print "END %s" % self.endRadian
         if(move and self.startRadian < self.maxLeft):
             self.startRadian += ROTATION_SPEED*DEG_TO_RAD
             self.endRadian += ROTATION_SPEED*DEG_TO_RAD
+            self.angle += DEG_TO_RAD
+            print "ANGLE %f" % self.angle
         else:
             return
     
     # Rotate the cannon to the right at current ROTATION_SPEED.
     def rotateRight(self, move):
+    	#print "START %s" % self.startRadian
+    	#print "END %s" % self.endRadian
         if(move and self.startRadian > self.maxRight):
             self.startRadian -= ROTATION_SPEED*DEG_TO_RAD
             self.endRadian -= ROTATION_SPEED*DEG_TO_RAD
+            self.angle -= DEG_TO_RAD
+            print "ANGLE %f" % self.angle
         else:
             return
-
 class Bubble:
     radius = RADIUS
     
@@ -368,12 +380,10 @@ while gameRunning:
             sys.exit()
         elif event.type == KEYDOWN:
             if event.key == pygame.K_UP:  # Fire a bubble.
-                print "fire"
-                gameScreen.fireBubble()
-            if event.key == pygame.K_LEFT:  # Move cannon left.
-                cannon.rotateLeft(True)
-                FIRE = True
-                print "True"
+            	print "fire"
+            	gameScreen.fireBubble()
+            	FIRE = True
+            	print "True"
             elif event.key == pygame.K_LEFT: # Move cannon left.
             	print "FIRE = %f" % FIRE
             	if FIRE == False:
