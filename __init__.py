@@ -6,7 +6,7 @@ Created on May 30, 2014
 
 
 '''
-NOTES UPDATED 7/2/2014
+NOTES UPDATED 7/3/2014
 Alex's Notes
     (7/2/2014)
     - Working on firing bubble. Current problem is accessing the bubbleStack list. When I try to pop/get the bubble to be fired it says that it
@@ -26,11 +26,20 @@ Alex's Notes
     - Let me know if you have any questions
     
 Evan's Notes
+<<<<<<< HEAD
 	(7/2/2014)
     - Noticed that, at least in the console window, you can move the cannon and fire at the same time
     (7/3/2014)
      - Before firing the bubble, a little calculation needs to be done. I believe that that angle of the open sector of the cannon is pi/2 to start, then either adding or subtracting
     - DEG_TO_RAD depending on turning the cannon left or right
+=======
+	(7/3/2014)
+    - Noticed that, at least in the console window, you can move the cannon and fire at the same time. It will be easier to see when we actually have a bubble firing
+    	- Checked with the old game. This doesn't matter because once up is pressed, the ball is fired and another one won't be loaded.
+    (7/3/2014)
+    - Before firing the bubble, a little calculation needs to be done. I believe that that angle of the open sector of the cannon is pi/2 to start, then either adding or subtracting
+    DEG_TO_RAD depending on turning the cannon left or right
+>>>>>>> origin/master
 '''
 
 import pygame, sys
@@ -50,6 +59,7 @@ TOTAL_COLUMNS = COLUMNS_ODD + COLUMNS_EVEN
 FIRE = False
 screenX, screenY = 640, 480
 DEG_TO_RAD = 0.0174532925
+FIRE = False
 
 # CLASS GAMEWORLD: Holds the values of the ongoing game including the current level, timer, score.
 # Class currently is not being fully utilized. A temporary "test" level is being used in the GameScreen class.
@@ -166,6 +176,13 @@ class Cannon:
         self.maxRight = 2.094395102 # 4PI/6
         self.maxLeft = 4.188790205  # 8PI/6
         self.angle = 1.570796317    # PI/2
+<<<<<<< HEAD
+=======
+        pygame.draw.arc(screen, self.cannonColor, self.rectangle, self.startRadian, self.endRadian, 3)
+    
+    def redraw(self):
+        self.loadCannon() # Check if cannon needs to be loaded
+>>>>>>> origin/master
         pygame.draw.arc(screen, self.cannonColor, self.rectangle, self.startRadian, self.endRadian, 3)
 
     def addBubble(self):
@@ -186,9 +203,14 @@ class Cannon:
         pygame.draw.arc(screen, self.cannonColor, self.rectangle, self.startRadian, self.endRadian, 3)
 
     def rotateLeft(self, move):
+<<<<<<< HEAD
         # rotateLeft: Rotate the cannon to the left at current ROTATION_SPEED.
         # print "START %s" % self.startRadian
         # print "END %s" % self.endRadian
+=======
+    	#print "START %s" % self.startRadian
+    	#print "END %s" % self.endRadian
+>>>>>>> origin/master
         if(move and self.startRadian < self.maxLeft):
             self.startRadian += ROTATION_SPEED*DEG_TO_RAD
             self.endRadian += ROTATION_SPEED*DEG_TO_RAD
@@ -198,9 +220,14 @@ class Cannon:
             return
     
     def rotateRight(self, move):
+<<<<<<< HEAD
         # rotateRight: Rotate the cannon to the right at current ROTATION_SPEED.
         # print "START %s" % self.startRadian
         # print "END %s" % self.endRadian
+=======
+    	#print "START %s" % self.startRadian
+    	#print "END %s" % self.endRadian
+>>>>>>> origin/master
         if(move and self.startRadian > self.maxRight):
             self.startRadian -= ROTATION_SPEED*DEG_TO_RAD
             self.endRadian -= ROTATION_SPEED*DEG_TO_RAD
@@ -208,8 +235,11 @@ class Cannon:
             print "ANGLE %f" % self.angle
         else:
             return
+<<<<<<< HEAD
 
 # BUBBLR CLASS: Bubble object that has a color and location. Can be turned into a cannon bubble and be assigned a movement value.
+=======
+>>>>>>> origin/master
 class Bubble:
     
     def __init__(self, bubbleColor, row, col):
@@ -367,10 +397,17 @@ while gameRunning:
             sys.exit()
         elif event.type == KEYDOWN:
             if event.key == pygame.K_UP:  # Fire a bubble.
+<<<<<<< HEAD
                 print "fire"
                 gameScreen.fireBubble()
                 FIRE = True
                 print "True"
+=======
+            	print "fire"
+            	gameScreen.fireBubble()
+            	FIRE = True
+            	print "True"
+>>>>>>> origin/master
             elif event.key == pygame.K_LEFT: # Move cannon left.
             	print "FIRE = %f" % FIRE
             	if FIRE == False:
