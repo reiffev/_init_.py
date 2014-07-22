@@ -39,14 +39,21 @@ Evan's Notes
     DEG_TO_RAD depending on turning the cannon left or right
 '''
 
-import pygame, sys
+'''
+Zhuotao's Notes:
+    (7/21/2014) 
+    - Problem: 1. Bubble can't move in accurate direction
+               2. REMOVING UNATTACHED BUBBLES part is not finished yet
+'''
+
+import pygame, sys, math
 from pygame.locals import *
 from random import randrange
 from math import *
 
 # Notes on Variables (7/1/2014)
 # Rotation speed is too fast currently.
-ROTATION_SPEED = 2
+ROTATION_SPEED = 1 # (7/21/2014) change from 2 to 1 
 RADIUS = 18
 DISTANCE = RADIUS * sqrt(3) 
 ROWS = 14
@@ -58,13 +65,16 @@ screenX, screenY = 640, 480
 DEG_TO_RAD = 0.0174532925
 FIRE = False
 
+BUBBLE_SPEED=20 # (7/17/2014) add variable BUBBLE_SPEED
+pointsForConnection=100 # (7/19/2014) add variable pointsForConnection. NOT BEING USED
+
 # CLASS GAMEWORLD: Holds the values of the ongoing game including the current level, timer, score.
 # Class currently is not being fully utilized. A temporary "test" level is being used in the GameScreen class.
 class GameWorld:
 
     def __init__(self):
         self.bubbleStack = []
-        self.connectedBubbles = [[]]
+        self.connectedBubbles = [[]] 
         self.attachedBubbles = [[]]
         self.vX = 0 # Velocity of X direction. NEITHER BEING USED
         self.vY = 0 # Velocity of Y direction.
@@ -93,7 +103,7 @@ class GameScreen:
         self.borderLine() # Build right line border.
         bubblesOnBoard = [   [1, 0, 0, 4, 0, 0, 3, 5],  # DEFAULT: Level 1 Test
                             [2, 1, 0, 4, 0, 0, 5],
-                            [0, 0, 0, 0, 0, 0, 0, 5],
+                            [0, 0, 0, 0, 0, 0, 0, 4], # (7/19) change 5 to 4 for testing
                             [0, 0, 0, 0, 0, 5, 5],
                             [0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0],
@@ -118,16 +128,33 @@ class GameScreen:
         # drawBubbles: CURRENTLY NOT WORKING. Draws the game screen of bubbles by traversing the gameWorld bubble stack. Also checks if bubble is moving (if statement) but what does not work
         #              is using it to get the bubble object for the "fireBubble" class to work above. Should be a simple fix, but it evades me (amsully).
         for index, bubble in enumerate(gameWorld.bubbleStack):
+
             if (bubble.move): 
                 self.bubblesParked = False # Determines if all of the bubbles are stopped.
-            pygame.draw.circle(screen, bubble.bubbleColor, (bubble.posX, int(bubble.posY)), RADIUS)
+            
+            pygame.draw.circle(screen, bubble.bubbleColor, (int(bubble.posX), int(bubble.posY)), RADIUS) # (7/17/2014) cast posX, posY to int to avoid the error
+          
+            
 
     def fireBubble(self):
         # fireBubble: CURRENTLY NOT WORKING. Problem in the bubbleStack list where an object cannot be used properly when trying to retrieve it.
-        print "FIRE BUBBLE"
+        print("FIRE BUBBLE")
         if(not self.bubblesParked):
+            
+            '''
+                (7/17/2014) Notes: Fixed the problem of firing bubble (change by Zhuotao Huang)
+                problem: Noticed that "math.cos()" and "math.sin()" return float numbers, but the coordinates of the bubble have 
+                        to be int. When we redraw the bubbles, it will give us an error. Thus, I just cast posX and posY 
+                        to int to avoid the error when redraw the bubbles, but I don't think it's the best way to fix it,
+                        because it turns out that the bubble can't move in the accurate direction. 
+            '''
+            gameWorld.bubbleStack[-1].velX = BUBBLE_SPEED * math.cos(self.cannon.angle) # set x velocity
+            gameWorld.bubbleStack[-1].velY = -BUBBLE_SPEED * math.sin(self.cannon.angle) # set y velocity
+
+            
+
 #             print gameWorld.bubbleStack.pop()
-            print "ERROR HERE WITH LIST - fireBubble() -"
+#            print("ERROR HERE WITH LIST - fireBubble() -")
             
     def getCannon(self):
         # getCannon: Returns cannon of GameScreen. Not necessary anymore but still implemented.
@@ -146,6 +173,7 @@ class GameScreen:
                         gameWorld.bubbleStack.append(bubble)
                         gameWorld.connectedBubbles = []  # Reset list to find new bubble chains. (6/25/14) This and below line can be turned into new chain method.
                         Bubble.checkBubbleChain(bubble, row, col, bubblesOnBoard)
+                       
                 # If it's odd row: start grid slightly offset of left side of screen.
                 else:
                     if(col < COLUMNS_ODD):
@@ -154,6 +182,7 @@ class GameScreen:
                             gameWorld.bubbleStack.append(bubble)
                             gameWorld.connectedBubbles = []  # Reset list to find new bubble chains. (6/25/14) This and below line can be turned into new chain method.
                             Bubble.checkBubbleChain(bubble, row, col, bubblesOnBoard)
+                           
 
     def redraw(self):
         # redraw: Called by main game loop. Updates the gameScreen's borderLine, bubbles, and cannon.
@@ -184,18 +213,38 @@ class Cannon:
         bubbleNew = Bubble(0, 0, 0) # Make new bubble.
         bubbleNew.cannonBubble() # Adjust bubble for cannon.
         gameWorld.bubbleStack.append(bubbleNew)
+       
 
     def loadCannon(self):
         # loadCannon: If the bubbles are not moving (assigned in game screen) then add a bubble to the cannon.
         if(gameScreen.bubblesParked):
-            print "Bubble Loaded"
-            self.addBubble()    
-
+            print('============================================================')
+            print("Bubble Loaded")
+            self.addBubble()   
+            
+            '''
+                7/19 testing
+            
+            for i in range(0,13):
+                if i%2==0:
+                    print('-------------------------------')
+                    for j in range (0,8):
+                        print(gameScreen.bubblesOnBoard[i][j])
+                else:
+                    print('--------------------------------')
+                    for k in range(0,7):
+                        print(gameScreen.bubblesOnBoard[i][k])
+            '''
+             
+    '''
+    (7/17/2014) Duplicated codes. just comment it out.
+    
     def redraw(self):
         # redraw: Loads cannon if necessary and redraws the cannon.
         self.loadCannon() # Check if cannon needs to be loaded
         pygame.draw.arc(screen, self.cannonColor, self.rectangle, self.startRadian, self.endRadian, 3)
-
+    '''
+            
     def rotateLeft(self, move):
         # rotateLeft: Rotate the cannon to the left at current ROTATION_SPEED.
         # print "START %s" % self.startRadian
@@ -206,7 +255,7 @@ class Cannon:
             self.startRadian += ROTATION_SPEED*DEG_TO_RAD
             self.endRadian += ROTATION_SPEED*DEG_TO_RAD
             self.angle += DEG_TO_RAD
-            print "ANGLE %f" % self.angle
+            print("ANGLE %f" % self.angle)
         else:
             return
     
@@ -220,7 +269,7 @@ class Cannon:
             self.startRadian -= ROTATION_SPEED*DEG_TO_RAD
             self.endRadian -= ROTATION_SPEED*DEG_TO_RAD
             self.angle -= DEG_TO_RAD
-            print "ANGLE %f" % self.angle
+            print("ANGLE %f" % self.angle)
         else:
             return
 
@@ -235,6 +284,10 @@ class Bubble:
         self.posX = self.getPosX(row)
         self.posY = self.getPosY(col)
         self.move = False
+        
+        self.velX=0 # (7/17) add variable velX
+        self.velY=0 # (7/17) add variable velY
+        self.name=str(row)+','+str(col) # (7/19) add variable name
 
     def cannonBubble(self):
         # cannonBubble: Assigns bubble to the cannon location.
@@ -242,6 +295,8 @@ class Bubble:
         self.move = True
         self.posX = RADIUS*8
         self.posY = 450
+        
+        
         
     def checkBubbleChain(self, row, col, bubblesOnBoard):
         # checkBubbleChain: Recursively create chain of matching bubbles that are attached.
@@ -253,6 +308,7 @@ class Bubble:
             for j in range(-1, 2):
                 if i != 0 or j != 0: 
                     if i == 0 or j == 0 or (j == -1 and odd == 0) or (j == 1 and odd == 1):
+                        # (7/21/2014) Find an error: list index out of range. NOT FIXED YET.
                         if self.inRange(row + i, col + j) and self.isNewChain(row + i, col + j, bubblesOnBoard[row][col], bubblesOnBoard): # If adjacent cell is in range and new.
                             self.checkBubbleChain(row + i, col + j, bubblesOnBoard) # Then recurse to that cell location.
 
@@ -305,12 +361,188 @@ class Bubble:
        
     def move(self):
         # move: CURRENTLY NOT WORKING: Will increment the bubble based on a direction and will determine if it needs to be positioned.
-        print "MOVED!"
+   #     print("MOVED!")
 #         x,y = self.getDirection()
 #         posX += x
 #         posY += y
 #         if(self.bump())
-#             row,col = self.closestSpot()   
+#             row,col = self.closestSpot() 
+        
+        
+        # (7/17/2014) Move the bubble after firing, check collisions with walls and top
+         
+        self.posX+=self.velX
+        self.posY+=self.velY
+        if self.posX-RADIUS<=0:
+            self.velX*=-1
+        elif self.posX+RADIUS>=RADIUS + RADIUS * TOTAL_COLUMNS:
+            self.velX*=-1
+        else:
+            pass
+        if self.posY-RADIUS<=0:
+            self.parkBubble()
+        else:
+            for index, bubble in enumerate(gameWorld.bubbleStack):
+                if(index!=len(gameWorld.bubbleStack)-1 and math.pow(bubble.posX-self.posX,2)+math.pow(bubble.posY-self.posY,2)<=math.pow((2*RADIUS-4),2)):
+                    print('index='+str(index))
+                    print(index!=len(gameWorld.bubbleStack)-1)
+                    print(math.pow(bubble.posX-self.posX,2)+math.pow(bubble.posY-self.posY,2)<=math.pow((2*RADIUS-4),2))
+                    self.parkBubble() 
+        
+    # (7/19/2014) add new methods - parkBubble
+    # (7/21/2014) Problem: Sometimes the bubble will go out of the screen from the top
+    # (7/21/2014) Notes: The REMOVING UNATTACHED BUBBLES part is not finished.
+    def parkBubble(self):
+        print('Bubble Parked')
+        
+        row=math.floor(self.posY/DISTANCE) 
+        col=0
+        
+        #depending on the row changes the way the column is calculated
+        if row%2==0:
+            col=math.floor(self.posX/(2*RADIUS))
+        else:
+            col=math.floor((self.posX-RADIUS)/(2*RADIUS))
+        
+        if self.inRange(row, col)==False:
+            print('LOST or ERROR: index out of range')
+        else: 
+            if gameScreen.bubblesOnBoard[row][col]>0: #check if the cell has been occupied
+                row+=1
+                if (row%2==0):
+                    col = math.floor(self.posX/(RADIUS*2))
+                else:
+                    col = math.floor((self.posX-RADIUS)/(RADIUS*2))
+        
+            if (row%2==0):
+                self.posX=(col*RADIUS*2)+RADIUS
+            else:
+                self.posX=(col*RADIUS*2)+2*RADIUS
+                
+            self.posY=(row*DISTANCE)+RADIUS
+            gameWorld.connectedBubbles = [] 
+            self.name=str(row)+','+str(col)
+            self.row=row
+            self.col=col
+            self.move=False
+            gameScreen.bubblesParked=True
+            self.placeBubble(row,col)
+            # gameScreen.loadBubbles(gameScreen.bubblesOnBoard)
+            self.checkBubbleChain(row, col, gameScreen.bubblesOnBoard)
+            print(len(gameWorld.connectedBubbles))
+            if(len(gameWorld.connectedBubbles)>2):
+                for i in range(0,len(gameWorld.connectedBubbles)):
+                    gameWorld.score+=pointsForConnection
+                    # showGameScore()
+                    # gameScreen.bubblesOnBoard.remove(gameWorld.connectedBubbles[i])
+                    
+                  
+                    for j in range(0,len(gameWorld.bubbleStack)-1):
+                        # print('j:'+str(j))
+                        # print('stack: '+str(gameWorld.bubbleStack[j].name))
+                        # print('connected:'+str(gameWorld.connectedBubbles[i]))
+                        if gameWorld.bubbleStack[j].name==str(gameWorld.connectedBubbles[i]):
+                            print(gameWorld.bubbleStack[j].row)
+                            print(gameWorld.bubbleStack[j].col)
+                            gameScreen.bubblesOnBoard[gameWorld.bubbleStack[j].row][gameWorld.bubbleStack[j].col]=0
+                            gameWorld.bubbleStack.remove(gameWorld.bubbleStack[j])
+                
+                gameScreen.bubblesOnBoard[self.row][self.col]=0    
+                gameWorld.bubbleStack.remove(self)
+                
+                '''
+                (7/20/2014) NOT FINISHED
+                
+                self.removeNotAttached()
+       
+                print('bubbles left:'+str(len(gameWorld.bubbleStack)))
+                print(gameWorld.connectedBubbles[i])
+                print('i='+str(i))
+                 #   gameScreen.loadBubbles(gameScreen.bubblesOnBoard)
+                '''
+                
+   # (7/20/2014) Need to finish. Remove unattached bubbles.  
+    def removeNotAttached(self):
+        '''
+        for i in range(0,13):
+            for j in range(0,8):
+                print('remove??????')
+                print(self.getValue(self.row, self.col, gameScreen.bubblesOnBoard))
+                if self.getValue(i,j, gameScreen.bubblesOnBoard)>0:
+                    print("000000000000000000000000000000")
+                    self.attachedBubbles=[]
+                    self.checkAttached(i,j,gameScreen.bubblesOnBoard)
+                    if (self.attachedBubbles[0]!='attached'):
+                        gameScreen.bubblesOnBoard[gameWorld.bubbleStack[j].row][gameWorld.bubbleStack[j].col]=0
+                        gameWorld.bubbleStack.remove(gameWorld.bubbleStack[j])
+        '''
+  # (7/20/2014) Need to finish. Check if the bubble is attached.
+    def checkAttached(self,row,col,bubblesOnBoard):
+        
+        '''
+        odd = row % 2
+        gameWorld.attachedBubbles.append(str(row) + "," + str(col))
+        for i in range(-1,2):
+            for j in range(-1,2):
+                if(i!=1 or j!=1):
+                    if i == 0 or j == 0 or (j == -1 and odd == 0) or (j == 1 and odd == 1):
+                        if self.inRange(row + i, col + j) and self.isNewChain(row + i, col + j, bubblesOnBoard[row][col], bubblesOnBoard):
+                            
+                            if(row+i==0):
+                                gameWorld.attachedBubbles[0]='attached'
+                                
+                            else:
+                                self.checkAttached(row+i,col+j)
+         '''  
+             
+    # (7/19/2014) Assign correct number in bubblesOnBoard according to the color.
+    def placeBubble(self,row,col): 
+        if self.inRange(row, col):
+            if self.bubbleColor==(12, 72, 237): 
+                gameScreen.bubblesOnBoard[row][col]=1 
+            elif self.bubbleColor== (237, 12, 34):
+                gameScreen.bubblesOnBoard[row][col]=2
+            elif self.bubbleColor==(0, 237, 83):
+                gameScreen.bubblesOnBoard[row][col]=3
+            elif self.bubbleColor==(224, 255, 51):
+                gameScreen.bubblesOnBoard[row][col]=4
+            elif self.bubbleColor==(255, 255, 255):
+                gameScreen.bubblesOnBoard[row][col]=5
+            print('(row,col)=('+str(row)+','+str(col)+')'+'; color is '+str(gameScreen.bubblesOnBoard[row][col])
+                  + '; (1=BLUE,2=RED,3=GREEN,4=YELLOW,5=WHITE)')
+        
+                  
+    ''' 
+    def getChain(self, row, col):
+        if self.bubbleColor==(12, 72, 237):
+            gameWorld.connectedBubbles[row][col]=1 
+        elif self.bubbleColor== (237, 12, 34):
+            gameWorld.connectedBubbles[row][col]=2
+        elif self.bubbleColor==(0, 237, 83):
+            gameWorld.connectedBubbles[row][col]=3
+        elif self.bubbleColor==(224, 255, 51):
+            gameWorld.connectedBubbles[row][col]=4
+        elif self.bubbleColor==(255, 255, 255):
+            gameWorld.connectedBubbles[row][col]=5
+        
+        odd=row%2
+        match=gameScreen.bubblesOnBoard[row][col]
+        
+        for i in range(-1,1):
+            for j in range(-1,1):
+                if (i!=0 or j!=0):
+                    if (i==0 or j==0 or (j==-1 and odd==0) or (j==1 and odd==1)):
+                        if (isNewChain(row+i,col+j,match)):
+                            getChain(row+i,col+j);
+    '''
+                           
+            
+        
+                
+
+
+
+
         
     def pickColor(self, number):
         # pickColor: Assigns a selected color to a bubble.
@@ -360,12 +592,16 @@ gameWorld = GameWorld()
 gameScreen = GameScreen(gameWorld, screen)  # Class to build screen/play board.
 cannon = gameScreen.getCannon()
 
+
 # Game loop.
 gameRunning = True
 while gameRunning:
-    delta_Time = clock.tick(30)  # 30 Frames per second?
+    delta_Time = clock.tick(60)  # 30 Frames per second? >>> (7/21/2014) change to 60
     screen.fill(backgroundColor) # Reset screen.
     gameScreen.redraw()          # Redraw screen.
+    
+    Bubble.move(gameWorld.bubbleStack[-1]) # (7/17/2014) call the move method in the main loop so that the bubble can keep moving
+   
     
     # CHECKS FOR ALREADY PRESSED KEYS
     keys_pressed = pygame.key.get_pressed()
@@ -382,32 +618,38 @@ while gameRunning:
             sys.exit()
         elif event.type == KEYDOWN:
             if event.key == pygame.K_UP:  # Fire a bubble.
-                print "fire"
+                print("fire")
                 gameScreen.fireBubble()
                 FIRE = True
-                print "True"
-            	print "fire"
-            	gameScreen.fireBubble()
-            	FIRE = True
-            	print "True"
+                print("True")
+                
+                '''
+                (7/17/2014) Duplicated codes. just comment it out.
+                
+                print("fire")
+                gameScreen.fireBubble()
+                FIRE = True
+                print("True")
+                '''
+                
             elif event.key == pygame.K_LEFT: # Move cannon left.
-            	print "FIRE = %f" % FIRE
+            	print("FIRE = %f" % FIRE)
             	if FIRE == False:
             		cannon.rotateLeft(True)
             	else:
             		cannon.rotateLeft(False)
-            	print "FIRE = %f" % FIRE
+            	print("FIRE = %f" % FIRE)
             elif event.key == pygame.K_RIGHT:  # Move cannon right.
-            	print "FIRE = %f" % FIRE
+            	print("FIRE = %f" % FIRE)
             	if FIRE == False:
             		cannon.rotateRight(True)
             	else:
             		cannon.rotateRight(False)
-            	print "FIRE = %f" % FIRE
+            	print("FIRE = %f" % FIRE)
         elif event.type == KEYUP:
         	if event.key == pygame.K_UP:
         		FIRE = False
-        		print "False"
+        		print("False")
         	if event.key == pygame.K_LEFT: 
         		cannon.rotateLeft(False)
         	elif event.key == pygame.K_RIGHT:
