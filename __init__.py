@@ -37,6 +37,30 @@ Evan's Notes
     (7/3/2014)
     - Before firing the bubble, a little calculation needs to be done. I believe that that angle of the open sector of the cannon is pi/2 to start, then either adding or subtracting
     DEG_TO_RAD depending on turning the cannon left or right
+    (7/21/2014)
+    - Getting this error after firing
+    	Traceback (most recent call last):
+  			File "init2.py", line 603, in <module>
+    			Bubble.move(gameWorld.bubbleStack[-1]) # (7/17/2014) call the move method in 
+    			the main loop so that the bubble can keep moving
+  			File "init2.py", line 390, in move self.parkBubble() 
+  			File "init2.py", line 410, in parkBubble
+    			if gameScreen.bubblesOnBoard[row][col]>0: #check if the cell has been occupied
+			TypeError: list indices must be integers, not float
+	(8/11/2014)
+	- Change made in parkBubble
+	- row and col in parkBubble were floats. Fixed the bug. Occasionally running into this error, similar to the one above:
+		Traceback (most recent call last):
+  			File "init2.py", line 625, in <module>
+    			Bubble.move(gameWorld.bubbleStack[-1]) # (7/17/2014) call the move method in 
+    			the main loop so that the bubble can keep moving
+ 			File "init2.py", line 404, in move self.parkBubble() 
+  			File "init2.py", line 450, in parkBubble
+    			self.placeBubble(row,col)
+  			File "init2.py", line 525, in placeBubble
+    			gameScreen.bubblesOnBoard[row][col]=2
+			TypeError: list indices must be integers, not float
+	
 '''
 
 '''
@@ -147,6 +171,9 @@ class GameScreen:
                         to be int. When we redraw the bubbles, it will give us an error. Thus, I just cast posX and posY 
                         to int to avoid the error when redraw the bubbles, but I don't think it's the best way to fix it,
                         because it turns out that the bubble can't move in the accurate direction. 
+                (7/21/2014) Evan Reiff
+                	I don't think the error is here. Three lines that are showing up in the error log are (around) 613, 400, and 420. The line
+                	numbers depend on when you run it with all the comments
             '''
             gameWorld.bubbleStack[-1].velX = BUBBLE_SPEED * math.cos(self.cannon.angle) # set x velocity
             gameWorld.bubbleStack[-1].velY = -BUBBLE_SPEED * math.sin(self.cannon.angle) # set y velocity
@@ -387,6 +414,7 @@ class Bubble:
                     print('index='+str(index))
                     print(index!=len(gameWorld.bubbleStack)-1)
                     print(math.pow(bubble.posX-self.posX,2)+math.pow(bubble.posY-self.posY,2)<=math.pow((2*RADIUS-4),2))
+                    #(7/21/2014) Error after firing showing up here
                     self.parkBubble() 
         
     # (7/19/2014) add new methods - parkBubble
@@ -395,7 +423,7 @@ class Bubble:
     def parkBubble(self):
         print('Bubble Parked')
         
-        row=math.floor(self.posY/DISTANCE) 
+        row=math.floor(self.posY/DISTANCE)
         col=0
         
         #depending on the row changes the way the column is calculated
@@ -404,9 +432,16 @@ class Bubble:
         else:
             col=math.floor((self.posX-RADIUS)/(2*RADIUS))
         
+        """(8/11/2014) row and col were floats for some reason. changed them to ints. Sometimes running into an error.
+        See comments above"""
+        row = int(row)
+        col = int(col)
+        print row, col
+        
         if self.inRange(row, col)==False:
             print('LOST or ERROR: index out of range')
         else: 
+        	#(7/21/2014) Error after firing showing up here
             if gameScreen.bubblesOnBoard[row][col]>0: #check if the cell has been occupied
                 row+=1
                 if (row%2==0):
@@ -600,6 +635,7 @@ while gameRunning:
     screen.fill(backgroundColor) # Reset screen.
     gameScreen.redraw()          # Redraw screen.
     
+    #(7/21/2014) Error after firing showing up here
     Bubble.move(gameWorld.bubbleStack[-1]) # (7/17/2014) call the move method in the main loop so that the bubble can keep moving
    
     
