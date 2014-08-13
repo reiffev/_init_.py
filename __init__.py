@@ -60,6 +60,10 @@ Evan's Notes
   			File "init2.py", line 525, in placeBubble
     			gameScreen.bubblesOnBoard[row][col]=2
 			TypeError: list indices must be integers, not float
+	(8/12/2014)
+	- While trying to fix the bug from yesterday, noticed that we haven't implemented the function where if you clear bubbles
+	and bubbles are left in free space (not touching any walls and detached from everything else) they don't go away
+	- Bug from yesterday is hard to recreate, but I have placed comments where I am getting the errors
 	
 '''
 
@@ -415,6 +419,7 @@ class Bubble:
                     print(index!=len(gameWorld.bubbleStack)-1)
                     print(math.pow(bubble.posX-self.posX,2)+math.pow(bubble.posY-self.posY,2)<=math.pow((2*RADIUS-4),2))
                     #(7/21/2014) Error after firing showing up here
+                    #(8/11/2014) Error occurring occasionally
                     self.parkBubble() 
         
     # (7/19/2014) add new methods - parkBubble
@@ -457,10 +462,11 @@ class Bubble:
             self.posY=(row*DISTANCE)+RADIUS
             gameWorld.connectedBubbles = [] 
             self.name=str(row)+','+str(col)
-            self.row=row
-            self.col=col
+            self.row=int(row)
+            self.col=int(col)
             self.move=False
             gameScreen.bubblesParked=True
+            #(8/11/2014) Error occurring occasionally
             self.placeBubble(row,col)
             # gameScreen.loadBubbles(gameScreen.bubblesOnBoard)
             self.checkBubbleChain(row, col, gameScreen.bubblesOnBoard)
@@ -531,7 +537,11 @@ class Bubble:
          '''  
              
     # (7/19/2014) Assign correct number in bubblesOnBoard according to the color.
-    def placeBubble(self,row,col): 
+    # (8/11/2014) Error occurring occasionally (depending on which color ball)
+    def placeBubble(self,row,col):
+    	#(8/12/2014) Thought fixing this new bug would be the same thing. Bug is still occurring "randomly"
+    	self.row = int(row)
+    	self.col = int(col) 
         if self.inRange(row, col):
             if self.bubbleColor==(12, 72, 237): 
                 gameScreen.bubblesOnBoard[row][col]=1 
@@ -636,6 +646,7 @@ while gameRunning:
     gameScreen.redraw()          # Redraw screen.
     
     #(7/21/2014) Error after firing showing up here
+    #(8/11/2014) Error occurring occasionally
     Bubble.move(gameWorld.bubbleStack[-1]) # (7/17/2014) call the move method in the main loop so that the bubble can keep moving
    
     
