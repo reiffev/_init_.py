@@ -64,6 +64,8 @@ Evan's Notes
 	- While trying to fix the bug from yesterday, noticed that we haven't implemented the function where if you clear bubbles
 	and bubbles are left in free space (not touching any walls and detached from everything else) they don't go away
 	- Bug from yesterday is hard to recreate, but I have placed comments where I am getting the errors
+	(8/14/2014)
+	- Trying to implement test function of being able to choose your color ball in the cannon
 	
 '''
 
@@ -124,6 +126,7 @@ class GameScreen:
         self.gameWorld = gameWorld # Gameworld taken.
         self.screen = screen # Screen size, info taken.
         self.bubblesParked = True # Variable holding whether or not all bubbles are stopped.
+        #not used
         self.movingBubble = Bubble(0,0,0) # Temporary bubble value. Replaced by bubble being fired.
         self.width, self.height = screen.get_size() # Width and height determined from screen.
         self.backGroundLayer = pygame.Surface(screen.get_size())
@@ -151,7 +154,7 @@ class GameScreen:
         self.borderX = RADIUS + RADIUS * TOTAL_COLUMNS # Total columns times radius of bubble plus radius for offset.
         self.borderY = screenY
         pygame.draw.line(screen, self.lineColor, (self.borderX, 0), (self.borderX, screenY), 5) # Thinking about changing this somehow. Make it more general.
-
+    
     def drawBubbles(self):
         # drawBubbles: CURRENTLY NOT WORKING. Draws the game screen of bubbles by traversing the gameWorld bubble stack. Also checks if bubble is moving (if statement) but what does not work
         #              is using it to get the bubble object for the "fireBubble" class to work above. Should be a simple fix, but it evades me (amsully).
@@ -326,8 +329,6 @@ class Bubble:
         self.move = True
         self.posX = RADIUS*8
         self.posY = 450
-        
-        
         
     def checkBubbleChain(self, row, col, bubblesOnBoard):
         # checkBubbleChain: Recursively create chain of matching bubbles that are attached.
@@ -693,6 +694,17 @@ while gameRunning:
             	else:
             		cannon.rotateRight(False)
             	print("FIRE = %f" % FIRE)
+            #(8/14/2014) changing the color of the ball in the cannon	
+            elif event.key == pygame.K_1:
+            	print "one"
+            elif event.key == pygame.K_2:
+            	print "two"
+            elif event.key == pygame.K_3:
+            	print "three"
+            elif event.key == pygame.K_4:
+            	print "four"
+            elif event.key == pygame.K_5:
+            	print "five"
         elif event.type == KEYUP:
         	if event.key == pygame.K_UP:
         		FIRE = False
