@@ -60,14 +60,12 @@ ROWS = 14
 COLUMNS_ODD = 7
 COLUMNS_EVEN = 8
 TOTAL_COLUMNS = COLUMNS_ODD + COLUMNS_EVEN
-FIRE = False
 screenX, screenY = 640, 480
 DEG_TO_RAD = 0.0174532925
 
 
 BUBBLE_SPEED=10 # (7/17/2014) add variable BUBBLE_SPEED
 pointsForConnection=100 # 100 points for each bubble
-
 
 # CLASS GAMEWORLD: Holds the values of the ongoing game including the current level, timer, score.
 # Class currently is not being fully utilized. A temporary "test" level is being used in the GameScreen class.
@@ -118,6 +116,29 @@ class GameScreen:
                             [0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0]]
+        '''bubblesOnBoard = [   [0, 0, 0, 0, 0, 0, 0, 0],	# Level with random bubbles
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0]]
+        t = 0
+        for r in range(ROWS):
+        	if t%2 == 0:
+        		for c in range(COLUMNS_EVEN):
+        			bubblesOnBoard[r][c] = randrange(1,6)
+        	else:
+        		for c in range(COLUMNS_ODD):
+        			bubblesOnBoard[r][c] = randrange(1,6)
+        	t+=1'''
         self.loadBubbles(bubblesOnBoard) # Load board bubbles.
 
     def borderLine(self):
@@ -197,7 +218,7 @@ class GameScreen:
         if len(gameWorld.bubbleStack)==1:
             gameWorld.GAME_OVER=True
             gameWorld.gameOver='WIN'
-        
+                    
 # CANNON CLASS: Represents a cannon that can rotate which adjusts trajectory of a bubble. Not much implemented yet. TODO: better graphic, and working rotation methods.
 class Cannon:
     
@@ -231,8 +252,6 @@ class Cannon:
             print('============================================================')
             print("Bubble Loaded")
             self.addBubble()   
-            FIRE = False
-
             
     def rotateLeft(self, move):
         # rotateLeft: Rotate the cannon to the left at current ROTATION_SPEED.
@@ -400,7 +419,7 @@ class Bubble:
             if row>=13:
                 gameWorld.GAME_OVER = True
                 gameWorld.gameOver = 'LOST'
-            print('LOST or ERROR: index out of range')
+            #print('LOST or ERROR: index out of range')
         else: 
             if gameScreen.bubblesOnBoard[row][col]>0: #check if the cell has been occupied
                 row+=1
@@ -579,6 +598,7 @@ cannon = gameScreen.getCannon()
 
 # Game loop.
 gameRunning = True
+FIRE = True
 while gameRunning:
     delta_Time = clock.tick(60)  # 30 Frames per second? >>> (7/21/2014) change to 60
     screen.fill(backgroundColor) # Reset screen.
@@ -600,31 +620,19 @@ while gameRunning:
             running = False
             pygame.quit()
             sys.exit()
+            
+        if gameWorld.GAME_OVER == True:
+    		FIRE = False
+            
         elif event.type == KEYDOWN:
-            if event.key == pygame.K_UP:  # Fire a bubble.
-            #  print("fire")
-                    gameScreen.fireBubble()
-                    FIRE = True
-                    #  print("True")
-                
+            if (event.key == pygame.K_UP) & FIRE == True:  # Fire a bubble.
+                gameScreen.fireBubble()              
             elif event.key == pygame.K_LEFT: # Move cannon left.
-            #	print("FIRE = %f" % FIRE)
-            	if FIRE == False:
-            		cannon.rotateLeft(True)
-            	else:
-            		cannon.rotateLeft(False)
-            #	print("FIRE = %f" % FIRE)
+            	cannon.rotateLeft(True)
             elif event.key == pygame.K_RIGHT:  # Move cannon right.
-            #	print("FIRE = %f" % FIRE)
-            	if FIRE == False:
-            		cannon.rotateRight(True)
-            	else:
-            		cannon.rotateRight(False)
-            #	print("FIRE = %f" % FIRE)
+            	cannon.rotateRight(True)
+            	
         elif event.type == KEYUP:
-        	if event.key == pygame.K_UP:
-        		FIRE = False
-       # 		print("False")
         	if event.key == pygame.K_LEFT: 
         		cannon.rotateLeft(False)
         	elif event.key == pygame.K_RIGHT:
@@ -636,13 +644,13 @@ while gameRunning:
         text = font.render("Score: %d " % gameWorld.score, True,(255,0,0))
         textpos = text.get_rect(centerx=screen.get_width()/2 + 100)
         screen.blit(text, textpos)
-    
+
     if pygame.font:
         font = pygame.font.Font(None, 26)
         text = font.render("Game Over: "+gameWorld.gameOver, True,(255,0,0))
         if gameWorld.GAME_OVER == True:
             screen.blit(text, (screen.get_width()/2,100))
-
+	
     pygame.display.update()
 
         
