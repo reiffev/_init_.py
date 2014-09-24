@@ -102,7 +102,7 @@ class GameScreen:
         self.backGroundLayer = pygame.Surface(screen.get_size())
         self.cannon = Cannon() # New cannon created. Currently contains manual parameters.
         self.borderLine() # Build right line border.
-        bubblesOnBoard = [   [1, 0, 0, 4, 0, 0, 3, 5],  # DEFAULT: Level 1 Test
+        '''bubblesOnBoard = [   [1, 0, 0, 4, 0, 0, 3, 5],  # DEFAULT: Level 1 Test
                             [2, 1, 0, 4, 0, 0, 5],
                             [0, 0, 0, 0, 0, 0, 0, 4], # (7/19) change 5 to 4 for testing
                             [0, 0, 0, 0, 0, 5, 5],
@@ -115,8 +115,8 @@ class GameScreen:
                             [0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 0]]
-        '''bubblesOnBoard = [   [0, 0, 0, 0, 0, 0, 0, 0],	# Level with random bubbles
+                            [0, 0, 0, 0, 0, 0, 0]]'''
+        bubblesOnBoard = [   [0, 0, 0, 0, 0, 0, 0, 0],	# Level with random bubbles
                             [0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0],
@@ -131,14 +131,14 @@ class GameScreen:
                             [0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0]]
         t = 0
-        for r in range(ROWS):
+        for r in range(8):
         	if t%2 == 0:
         		for c in range(COLUMNS_EVEN):
         			bubblesOnBoard[r][c] = randrange(1,6)
         	else:
         		for c in range(COLUMNS_ODD):
         			bubblesOnBoard[r][c] = randrange(1,6)
-        	t+=1'''
+        	t+=1
         self.loadBubbles(bubblesOnBoard) # Load board bubbles.
 
     def borderLine(self):
