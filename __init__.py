@@ -596,14 +596,14 @@ cannon = gameScreen.getCannon()
 # Game loop.
 gameRunning = True
 FIRE = True
-#TIME = True
+TIME = True
 while gameRunning:
     delta_Time = clock.tick(55)  # 30 Frames per second? >>> (7/21/2014) change to 60
     screen.fill(backgroundColor) # Reset screen.
     gameScreen.redraw()          # Redraw screen.
     
-    #if(TIME == True):
-    	#seconds = pygame.time.get_ticks()/1000
+    if(TIME == True):
+    	seconds = pygame.time.get_ticks()/1000
     
     Bubble.move(gameWorld.bubbleStack[-1]) # (7/17/2014) call the move method in the main loop so that the bubble can keep moving
     
@@ -623,7 +623,7 @@ while gameRunning:
             
         if gameWorld.GAME_OVER == True:
     		FIRE = False
-    		#TIME = False
+    		TIME = False
             
         elif event.type == KEYDOWN:
             if (event.key == pygame.K_UP) & FIRE == True:  # Fire a bubble.
@@ -646,11 +646,11 @@ while gameRunning:
         textpos = text.get_rect(centerx=screen.get_width()/2 + 100)
         screen.blit(text, textpos)
         
-    #if pygame.font:
-     #   font = pygame.font.Font(None, 26)
-      #  text = font.render("Time: %d " % seconds, True,(255,0,0))
-       # textpos = text.get_rect(centerx=screen.get_width()/2 + 200)
-        #screen.blit(text, textpos)
+    if pygame.font:
+        font = pygame.font.Font(None, 26)
+        text = font.render("Time: %d " % seconds, True,(255,0,0))
+        textpos = text.get_rect(centerx=screen.get_width()/2 + 225)
+        screen.blit(text, textpos)
 
     if pygame.font:
         font = pygame.font.Font(None, 26)
