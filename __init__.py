@@ -1,59 +1,9 @@
-'''
-Created on May 30, 2014
-
-@author: Alex Sullivan
-'''
-
-
-'''
-NOTES UPDATED 7/3/2014
-Alex's Notes
-    (7/2/2014)
-    - Working on firing bubble. Current problem is accessing the bubbleStack list. When I try to pop/get the bubble to be fired it says that it
-    is not callable and throws an exception. Spent a good amount of time troubleshooting to no avail. (Fire, gameScreen.fireBubble, if bubble
-    isn't parked then move, get direction,... more methods that need implementation).
-    - Added a "redraw" method for screen and cannon. Checks and loads cannon if needed.
-    - Rotation of cannon working.
-    (7/1/2014)
-    - Comments added up until the bubble class. Some noted TODO are getting the rotation of cannon to work, better cannon graphic, and learning/implementing pygame sprites..and more.
-    - Finally got the chain to be recognized - Finished debugging (swapped while loop for for loop and worked every test)
-    - Need to comment code -- will probably spend time writing good comments.
-    (Late June)
-    - Been working on recognizing the chain. Made some good progress and as you can see based on the True's when you run the code there are some connections being made.
-    - My work will continue to polish this backend chain identification. You will notice I added more methods to the Bubble class and completely got RID of the placeBubble method.
-    - Hashs (#) that are all the way to the left represents Code that is commented out. I also denoted most of my comments with a Date (6/25/14) so you can see what I did.
-    - Also note: The GameWorld class does not really do anything right now... It will be used once the graphics and mechanis are done and we can add levels, moving bubbles, etc.
-    - Let me know if you have any questions
-    
-Evan's Notes
-	(7/2/2014)
-    - Noticed that, at least in the console window, you can move the cannon and fire at the same time
-    (7/3/2014)
-     - Before firing the bubble, a little calculation needs to be done. I believe that that angle of the open sector of the cannon is pi/2 to start, then either adding or subtracting
-    - DEG_TO_RAD depending on turning the cannon left or right
-	(7/3/2014)
-    - Noticed that, at least in the console window, you can move the cannon and fire at the same time. It will be easier to see when we actually have a bubble firing
-    	- Checked with the old game. This doesn't matter because once up is pressed, the ball is fired and another one won't be loaded.
-    (7/3/2014)
-    - Before firing the bubble, a little calculation needs to be done. I believe that that angle of the open sector of the cannon is pi/2 to start, then either adding or subtracting
-    DEG_TO_RAD depending on turning the cannon left or right
-'''
-
-'''
-Zhuotao's Notes:
-    (9/20/2014)
-    - The code is now working, but there are still some unknown bugs. 
-    
-'''
-
 import pygame, sys, math
 from pygame.locals import *
 from random import randrange
 from math import *
 
-# Notes on Variables (7/1/2014)
-# Rotation speed is too fast currently.
-ROTATION_SPEED = 1 # (7/21/2014) change from 2 to 1 
+ROTATION_SPEED = 1
 RADIUS = 18
 DISTANCE = RADIUS * sqrt(3) 
 ROWS = 14
@@ -64,7 +14,7 @@ screenX, screenY = 640, 480
 DEG_TO_RAD = 0.0174532925
 
 
-BUBBLE_SPEED=10 # (7/17/2014) add variable BUBBLE_SPEED
+BUBBLE_SPEED=10
 pointsForConnection=100 # 100 points for each bubble
 
 # CLASS GAMEWORLD: Holds the values of the ongoing game including the current level, timer, score.
@@ -78,9 +28,7 @@ class GameWorld:
         self.vX = 0 # Velocity of X direction. NEITHER BEING USED
         self.vY = 0 # Velocity of Y direction.
 
-    timer = 0 # NOT CURRENTLY IN USE.
-    level = 0 # NOT CURRENTLY IN USE.
-    score = 0 # NOT CURRENTLY IN USE.
+    score = 0
     gameOver = '' # WIN or LOST
     GAME_OVER = False # is the game over?
     # maxLevel, highScore... lives?
@@ -147,33 +95,20 @@ class GameScreen:
         pygame.draw.line(screen, self.lineColor, (self.borderX, 0), (self.borderX, screenY), 5) # Thinking about changing this somehow. Make it more general.
 
     def drawBubbles(self):
-        # drawBubbles: CURRENTLY NOT WORKING. Draws the game screen of bubbles by traversing the gameWorld bubble stack. Also checks if bubble is moving (if statement) but what does not work
-        #              is using it to get the bubble object for the "fireBubble" class to work above. Should be a simple fix, but it evades me (amsully).
-        # ~~~~~~~~~~~~~~~~~~~~~~~
-        # PROBLEM FIXED
         for index, bubble in enumerate(gameWorld.bubbleStack):
 
             if (bubble.move): 
                 self.bubblesParked = False # Determines if all of the bubbles are stopped.
         
-            pygame.draw.circle(screen, bubble.bubbleColor, (int(bubble.posX), int(bubble.posY)), RADIUS) # (7/17/2014) cast posX, posY to int to avoid the error
-          
-            
+            pygame.draw.circle(screen, bubble.bubbleColor, (int(bubble.posX), int(bubble.posY)), RADIUS) # (7/17/2014) cast posX, posY to int to avoid the error    
 
     def fireBubble(self):
-        # fireBubble: CURRENTLY NOT WORKING. Problem in the bubbleStack list where an object cannot be used properly when trying to retrieve it.
-        # problem has been fixed
-        
         # fireBubble: calculate and set the x and y velocity
         print("FIRE BUBBLE")
         if(not self.bubblesParked):
             if(gameWorld.bubbleStack[-1].velY==0):
                 gameWorld.bubbleStack[-1].velX = BUBBLE_SPEED * math.cos(self.cannon.angle) # set x velocity
                 gameWorld.bubbleStack[-1].velY = -BUBBLE_SPEED * math.sin(self.cannon.angle) # set y velocity
-            
-
-#             print gameWorld.bubbleStack.pop()
-#            print("ERROR HERE WITH LIST - fireBubble() -")
             
     def getCannon(self):
         # getCannon: Returns cannon of GameScreen. Not necessary anymore but still implemented.
@@ -188,7 +123,7 @@ class GameScreen:
             for col in range(COLUMNS_EVEN):
                 # If it is an even row. Load 1st 7 rows with bubbles.
                 if(row % 2 == 0):
-                    if(row < 8 and self.bubblesOnBoard[row][col] > 0): # If inbounds and the bubble exists (>0).
+                    if(row < 14 and self.bubblesOnBoard[row][col] > 0): # If inbounds and the bubble exists (>0).
                         bubble = Bubble(bubblesOnBoard[row][col], row, col)
                         gameWorld.bubbleStack.append(bubble)
                         gameWorld.connectedBubbles = []  # Reset list to find new bubble chains. (6/25/14) This and below line can be turned into new chain method.
@@ -197,7 +132,7 @@ class GameScreen:
                 # If it's odd row: start grid slightly offset of left side of screen.
                 else:
                     if(col < COLUMNS_ODD):
-                        if(row < 8 and self.bubblesOnBoard[row][col] > 0): # If inbounds and the bubble exists (>0).
+                        if(row < 14 and self.bubblesOnBoard[row][col] > 0): # If inbounds and the bubble exists (>0).
                             bubble = Bubble(bubblesOnBoard[row][col], row, col)
                             gameWorld.bubbleStack.append(bubble)
                             gameWorld.connectedBubbles = []  # Reset list to find new bubble chains. (6/25/14) This and below line can be turned into new chain method.
@@ -253,29 +188,19 @@ class Cannon:
             
     def rotateLeft(self, move):
         # rotateLeft: Rotate the cannon to the left at current ROTATION_SPEED.
-        # print "START %s" % self.startRadian
-        # print "END %s" % self.endRadian
-    	#print "START %s" % self.startRadian
-    	#print "END %s" % self.endRadian
         if(move and self.startRadian < self.maxLeft):
             self.startRadian += ROTATION_SPEED*DEG_TO_RAD
             self.endRadian += ROTATION_SPEED*DEG_TO_RAD
             self.angle += DEG_TO_RAD
-        #    print("ANGLE %f" % self.angle)
         else:
             return
     
     def rotateRight(self, move):
         # rotateRight: Rotate the cannon to the right at current ROTATION_SPEED.
-        # print "START %s" % self.startRadian
-        # print "END %s" % self.endRadian
-    	#print "START %s" % self.startRadian
-    	#print "END %s" % self.endRadian
         if(move and self.startRadian > self.maxRight):
             self.startRadian -= ROTATION_SPEED*DEG_TO_RAD
             self.endRadian -= ROTATION_SPEED*DEG_TO_RAD
             self.angle -= DEG_TO_RAD
-        #    print("ANGLE %f" % self.angle)
         else:
             return
 
@@ -291,9 +216,9 @@ class Bubble:
         self.posY = self.getPosY(col)
         self.move = False
         
-        self.velX=0 # (7/17) add variable velX
-        self.velY=0 # (7/17) add variable velY
-        self.name=str(row)+','+str(col) # (7/19) add variable name
+        self.velX=0
+        self.velY=0
+        self.name=str(row)+','+str(col)
 
     def cannonBubble(self):
         # cannonBubble: Assigns bubble to the cannon location.
@@ -301,8 +226,6 @@ class Bubble:
         self.move = True
         self.posX = RADIUS*8
         self.posY = 450
-        
-        
         
     def checkBubbleChain(self, row, col, bubblesOnBoard):
         # checkBubbleChain: Recursively create chain of matching bubbles that are attached.
@@ -367,16 +290,7 @@ class Bubble:
         return (alreadyVisited == False) and valuesMatch
        
     def move(self):
-        # move: CURRENTLY NOT WORKING: Will increment the bubble based on a direction and will determine if it needs to be positioned.
-   #     print("MOVED!")
-#         x,y = self.getDirection()
-#         posX += x
-#         posY += y
-#         if(self.bump())
-#             row,col = self.closestSpot() 
-        
-        
-        # (7/17/2014) Problem has been fixed: Move the bubble after firing, check collisions with walls and top 
+		#Move the bubble after firing, check collisions with walls and top 
         self.posX+=self.velX
         self.posY+=self.velY
         if self.posX-RADIUS<=0:
@@ -390,12 +304,7 @@ class Bubble:
         else:
             for index, bubble in enumerate(gameWorld.bubbleStack):
                 if(index!=len(gameWorld.bubbleStack)-1 and math.pow(bubble.posX-self.posX,2)+math.pow(bubble.posY-self.posY,2)<=math.pow((2*RADIUS-4),2)):
-                 #   print('index='+str(index))
-                 #   print(index!=len(gameWorld.bubbleStack)-1)
-                 #   print(math.pow(bubble.posX-self.posX,2)+math.pow(bubble.posY-self.posY,2)<=math.pow((2*RADIUS-4),2))
                     self.parkBubble() 
-       
-
 
     def parkBubble(self):
         # parkBubble: calculate and set the position where the bubble should park
@@ -417,7 +326,6 @@ class Bubble:
             if row>=13:
                 gameWorld.GAME_OVER = True
                 gameWorld.gameOver = 'LOST'
-            #print('LOST or ERROR: index out of range')
         else: 
             if gameScreen.bubblesOnBoard[row][col]>0: #check if the cell has been occupied
                 row+=1
@@ -451,8 +359,7 @@ class Bubble:
                     gameWorld.score+=pointsForConnection
                     # showGameScore()
                     # gameScreen.bubblesOnBoard.remove(gameWorld.connectedBubbles[i])
-                    
-                  
+                	               
                     for j in range(0,len(gameWorld.bubbleStack)-1):
                         # print('j:'+str(j))
                         # print('stack: '+str(gameWorld.bubbleStack[j].name))
@@ -527,8 +434,7 @@ class Bubble:
                            #     print('mark as attached: '+str(row)+","+str(col))   
                                 gameWorld.attachedBubbles[0]='attached'
                             else:
-                                self.checkAttached(row+i,col+j, bubblesOnBoard)
-      
+                                self.checkAttached(row+i,col+j, bubblesOnBoard)    
         
     def placeBubble(self,row,col): 
         # placeBubble: Assign color value in bubblesOnBoard according to the color.
@@ -598,14 +504,14 @@ gameRunning = True
 FIRE = True
 TIME = True
 while gameRunning:
-    delta_Time = clock.tick(55)  # 30 Frames per second? >>> (7/21/2014) change to 60
+    delta_Time = clock.tick(55)  # FPS
     screen.fill(backgroundColor) # Reset screen.
     gameScreen.redraw()          # Redraw screen.
     
     if(TIME == True):
     	seconds = pygame.time.get_ticks()/1000
     
-    Bubble.move(gameWorld.bubbleStack[-1]) # (7/17/2014) call the move method in the main loop so that the bubble can keep moving
+    Bubble.move(gameWorld.bubbleStack[-1]) # call the move method in the main loop so that the bubble can keep moving
     
     # CHECKS FOR ALREADY PRESSED KEYS
     keys_pressed = pygame.key.get_pressed()
