@@ -1,7 +1,6 @@
 from random import choice
 from .arrow import *
 
-# This is where I am at so far with comments. I'm still working through a bit of stuff but good head way - GF
 
 class Game:
     renderclock = time.Clock()
@@ -33,8 +32,8 @@ class Game:
         Game.colors_count = {'red': 0, 'blu': 0, 'yel': 0, 'gre': 0, 'pur': 0, 'bla': 0}   # colors list and count
         Game.d = {}                             # list of tuples of all the existing grid points with balls on them. Contains keys that come from l
         Game.l = []                             # tuple of ball just fired. if connected to same color it appends the other balls to it.
-        Game.l0 = []
-        Game.l1 = []
+        Game.l0 = []                            # ball location x, y appended from l[0] so it can apply star3.png
+        Game.l1 = []                            # ball location x, y appended from l0[0] so it can apply star3.png
         if level == None:  # si mode == classic
             Game.addline(10)  # <---------------------------------------- number of start lines
             Game.ball_nb = -1
@@ -84,8 +83,13 @@ class Game:
                         # x = 20; y = 34
                         if (X + x, Y + y) in Game.d and Game.d[(X + x, Y + y)] == Game.ball.color and (X + x, Y + y) not in l:
                                 l.append((X + x, Y + y))        # appends new position into l if not in already
+                                print "printing l"
                                 print l
-                if len(l) >= 3:                                 #checks if there is a color length combo >= 3
+                                print "printing Game.l0"
+                                print Game.l0
+                                print "printing Game.l1"
+                                print Game.l1
+                if len(l) >= 3:                                 # checks if there is a color length combo >= 3
                     Game.scoreN = 2                             # Game.scoreN is overall game score. Need to fix totaling
                     for x, y in l:
                         Game.d.pop((x, y))                        # deletes each ball from l that was just popped
@@ -97,9 +101,9 @@ class Game:
                     k = [(x, y) for x, y in m if y == beta]
                     for X, Y in k:
                         m.pop((X, Y))
-                        for x, y in (
-                        (-gamma, 0), (-beta, -alpha), (beta, -alpha), (gamma, 0), (-beta, alpha), (beta, alpha)):
-                            if (X + x, Y + y) in m and not (X + x, Y + y) in k: k.append((X + x, Y + y))
+                        for x, y in ((-gamma, 0), (-beta, -alpha), (beta, -alpha), (gamma, 0), (-beta, alpha), (beta, alpha)):
+                            if (X + x, Y + y) in m and not (X + x, Y + y) in k:
+                                k.append((X + x, Y + y))
                     Game.l.extend(l)
                     Game.scorebonus = Game.ball.shot / (1000 * (len(Game.l) - 2))
                     for (x, y), color in m.items():
@@ -147,26 +151,28 @@ class Game:
         if Game.score == Game.final_score:
             Animation.remove(Game.update_final_score)
 
-
+    # When 3 or more balls connected, blow up balls animation
+    # provides the animation for each ball explosion
     @staticmethod
-    def plop():                                 # When 3 or more balls connected, blow up balls animation
+    def plop():
         Game.Animtime += Game.Animclock.tick()
         if Game.Animtime >= 80:
-            if Game.l1:
+            if Game.l1:                 # applies animation of hole and removes from the list
                 x, y = Game.l1.pop(0)
                 Game.balls_layer.blit(applies_alpha(hole, bg.subsurface(x - beta, y - beta, gamma, gamma)),
                                       (x - beta, y - beta))
-            if Game.l0:
+            if Game.l0:                 # appends l1[0] to l0 and applies animation of star1 and removes from the list
                 x, y = Game.l0.pop(0)
                 Game.balls_layer.blit(applies_alpha(star3, bg.subsurface(x - beta, y - beta, gamma, gamma)),
                                       (x - beta, y - beta))
                 Game.l1.append((x, y))
-            if Game.l:
+            if Game.l:                  # appends l0[0] to l0 and applies animation of star1 and removes from the list
                 x, y = Game.l.pop(0)
                 Game.balls_layer.blit(applies_alpha(star1, bg.subsurface(x - beta, y - beta, gamma, gamma)),
                                       (x - beta, y - beta))
                 Game.l0.append((x, y))
                 Game.scoreN -= 1
+                blop.play()
                 if Game.scoreN < 0:
                     Game.score += 1 + Game.scorebonus
             elif not Game.l0 and not Game.l1:
