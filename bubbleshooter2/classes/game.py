@@ -1,5 +1,6 @@
 from random import choice
 from .arrow import *
+from collections import deque
 
 
 class Game:
@@ -10,6 +11,7 @@ class Game:
     Animtime = 0
     # newlinertime = 0
     parite = 1
+    colorqueue=deque()
 
     @staticmethod
     def choice_color():                             # chooses colors from color list
@@ -67,9 +69,14 @@ class Game:
                 if not Game.ball_nb:
                     Game.status = 1                             # need to identify status #'s to remember easier
                     return
-                color = Game.choice_color()                     # random color selection
-                Game.ball = Ball(color)
-                Game.colors_count[color] += 1                   # increments balls of that randomized color
+
+                while len(Game.colorqueue) < 2:                   # while loop make sure the queue has 2 color, 1 for dequeue, 1 for next color
+                    Game.colorqueue.append(Game.choice_color())
+                currentcolor=Game.colorqueue.popleft()
+                Game.ball = Ball(currentcolor)
+
+                Game.colors_count[currentcolor] += 1                   # increments balls of that randomized color
+
             elif Game.ball.fix:
                 Game.balls_layer.blit(Game.ball.img, Game.ball)
                 Game.d[Game.ball.center] = Game.ball.color
@@ -172,7 +179,6 @@ class Game:
                                       (x - beta, y - beta))
                 Game.l0.append((x, y))
                 Game.scoreN -= 1
-                blop.play()
                 if Game.scoreN < 0:
                     Game.score += 1 + Game.scorebonus
             elif not Game.l0 and not Game.l1:
@@ -199,6 +205,11 @@ class Game:
                 label = menu2font.render('balls remaining : ' + str(int(Game.ball_nb)), 1, (150, 200, 200))
                 rlabel = label.get_rect(bottomright=rlabel.topright)
                 scr.blit(label, rlabel)
+
+            # render for next color
+            nextcolor=menu2font.render("Next ball : " + Game.colorqueue[0],1,(255,255,255))
+            nextcolorpos= label.get_rect(bottomleft=screen.move(5,-110).bottomleft)
+            scr.blit(nextcolor,nextcolorpos)
 
             display.flip()
             Game.rendertime = 0
