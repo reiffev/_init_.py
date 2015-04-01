@@ -207,8 +207,9 @@ class Game:
                 scr.blit(label, rlabel)
 
             # render for next color
-            nextcolor=menu2font.render("Next ball : " + Game.colorqueue[0],1,(255,255,255))
+            nextcolor=menu2font.render("Next ball : ",1,(255,255,255))
             nextcolorpos= label.get_rect(bottomleft=screen.move(5,-110).bottomleft)
+            scr.blit(balls[Game.colorqueue[0]],label.get_rect(bottomleft=screen.move(105,-120).bottomleft))
             scr.blit(nextcolor,nextcolorpos)
 
             display.flip()
@@ -315,7 +316,7 @@ class Ball(Rect):
             if self.cmp == 10:
                 Animation.remove(self.appears)
                 Animation.add(self.rebour)
-                self.cmprebour = 3
+                self.cmprebour = 0
                 self.time = 0
                 return
             self.time = 0
