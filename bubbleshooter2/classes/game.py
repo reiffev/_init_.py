@@ -2,7 +2,6 @@ from random import choice
 from .arrow import *
 from collections import deque
 
-
 class Game:
     renderclock = time.Clock()
     Animclock = time.Clock()
@@ -36,14 +35,15 @@ class Game:
         Game.l = []                             # tuple of ball just fired. if connected to same color it appends the other balls to it.
         Game.l0 = []                            # ball location x, y appended from l[0] so it can apply star3.png
         Game.l1 = []                            # ball location x, y appended from l0[0] so it can apply star3.png
+
         if level == None:  # si mode == classic
-            Game.addline(10)  # <---------------------------------------- number of start lines
+            Game.addline(10)  # <----------------------------------------Number of lines to start
             Game.ball_nb = -1
             Animation.add(Game.newliner)
             Game.newlinerclock.tick()
             Game.newlinertime = 0
         else:
-            Game.ball_nb = 10 + bonus_ball  # <--------------------------------------- Number of balls in the challenge mode
+            Game.ball_nb = 10 + bonus_ball  # <---------------------------------------Number of balls in challenge mode
             #Game.colors_count.update({'bla':0})
             for x, y in level[0]:
                 color = Game.choice_color()
@@ -65,22 +65,21 @@ class Game:
     @staticmethod
     def update():
         if not Game.status:
-            if not Game.ball:                                   # checks if ball queued up
+            if not Game.ball:                                     # checks if ball queued up
                 if not Game.ball_nb:
-                    Game.status = 1                             # need to identify status #'s to remember easier
+                    Game.status = 1                               # need to identify status #'s to remember easier
                     return
-
                 while len(Game.colorqueue) < 2:                   # while loop make sure the queue has 2 color, 1 for dequeue, 1 for next color
                     Game.colorqueue.append(Game.choice_color())
                 currentcolor=Game.colorqueue.popleft()
                 Game.ball = Ball(currentcolor)
 
                 Game.colors_count[currentcolor] += 1                   # increments balls of that randomized color
-
             elif Game.ball.fix:
                 Game.balls_layer.blit(Game.ball.img, Game.ball)
                 Game.d[Game.ball.center] = Game.ball.color
-                l = [Game.ball.center]                          # adds position of ball on grid to array l <- [(x,y)]
+                l = [Game.ball.center]                                 # adds position of ball on grid to array l <- [(x,y)]
+                Game.tmp = {}
                 print Game.dkeys                                # Game.dkeys
                 print l
                 for X, Y in l:                                  # checks for surrounding balls
@@ -108,12 +107,17 @@ class Game:
                     k = [(x, y) for x, y in m if y == beta]
                     for X, Y in k:
                         m.pop((X, Y))
-                        for x, y in ((-gamma, 0), (-beta, -alpha), (beta, -alpha), (gamma, 0), (-beta, alpha), (beta, alpha)):
+                        for x, y in (
+                        (-gamma, 0), (-beta, -alpha), (beta, -alpha), (gamma, 0), (-beta, alpha), (beta, alpha)):
                             if (X + x, Y + y) in m and not (X + x, Y + y) in k:
                                 k.append((X + x, Y + y))
                     Game.l.extend(l)
                     Game.scorebonus = Game.ball.shot / (1000 * (len(Game.l) - 2))
                     for (x, y), color in m.items():
+                        Game.tmpy = y
+                        if y < Game.tmpy:
+                            Game.tmpy = y
+                        Game.tmp[(x, y)] = color
                         Game.d.pop((x, y))
                         Game.colors_count[color] -= 1
                         if not Game.colors_count[color]:
@@ -121,6 +125,10 @@ class Game:
                     Game.l.extend(m.keys())
                     if not Game.colors_count:
                         Game.status = 1
+                    if m:
+                        print "adding Game.drop"
+                        Animation.add(Game.drop)
+                    print "adding Game.plop"
                     Animation.add(Game.plop)
                 elif Game.ball.bottom > eta:
                     Game.status = 1
@@ -166,6 +174,7 @@ class Game:
         if Game.Animtime >= 80:
             if Game.l1:                 # applies animation of hole and removes from the list
                 x, y = Game.l1.pop(0)
+
                 Game.balls_layer.blit(applies_alpha(hole, bg.subsurface(x - beta, y - beta, gamma, gamma)),
                                       (x - beta, y - beta))
             if Game.l0:                 # appends l1[0] to l0 and applies animation of star1 and removes from the list
@@ -178,6 +187,9 @@ class Game:
                 Game.balls_layer.blit(applies_alpha(star1, bg.subsurface(x - beta, y - beta, gamma, gamma)),
                                       (x - beta, y - beta))
                 Game.l0.append((x, y))
+                print "printing x, y in l"
+                print x, y
+
                 Game.scoreN -= 1
                 if Game.scoreN < 0:
                     Game.score += 1 + Game.scorebonus
@@ -217,7 +229,7 @@ class Game:
             return True
 
     @staticmethod
-    def addline(n=1):                           # adds line when newliner called
+    def addline(n=1):                                   # adds line when newliner called
         Game.balls_layer.set_alpha(255)
         for n in range(n):
             Game.d = dict([((x, y + alpha), color) for (x, y), color in Game.d.items()])
@@ -230,11 +242,12 @@ class Game:
         Game.balls_layer.blit(bg, screen)
         for (x, y), color in Game.d.items():
             Game.balls_layer.blit(balls[color], (x - beta, y - beta))
-            if y >= zeta: Game.status = 1
+            if y >= zeta:
+                Game.status = 1
         Game.balls_layer.set_alpha(100)
 
     @staticmethod
-    def newliner():                             # checks if timer > 20 seconds and if match was not made with 2 others
+    def newliner():                                     # checks if timer > 20 seconds and if match was not made with 2 others
         if Game.status:
             Animation.remove(Game.newliner)
             return
@@ -244,7 +257,7 @@ class Game:
             Game.newlinertime -= 20000
 
     @staticmethod
-    def pause_resume():                         # pauses game when esc pressed
+    def pause_resume():                                 # pauses game when esc pressed
         if Game.pause:
             Game.renderclock.tick()
             Game.Animclock.tick()
@@ -252,13 +265,38 @@ class Game:
             if Game.ball:
                 Game.ball.clock.tick()
             mouse.set_pos(Game.pause_mouse_pos)
-            Game.maintime += time.get_ticks() - Game.pause_tick     # sets time by subtracting pause time from main time
+            Game.maintime += time.get_ticks() - Game.pause_tick             # sets time by subtracting pause time from main time
             Game.pause = False
         else:
-            Game.pause_mouse_pos = mouse.get_pos()                  # gets mouse position when unpaused
+            Game.pause_mouse_pos = mouse.get_pos()                          # gets mouse position when unpaused
             Game.pause_tick = time.get_ticks()
             Game.pause = True
 
+    @staticmethod
+    def drop():
+        print "in drop"
+        Game.balls_layer.set_alpha(255)
+        Game.tmp = dict([((x, y + 10), color) for (x, y), color in Game.tmp.items()])
+        Game.balls_layer.blit(bg, screen)
+        Game.dropcopy = Game.tmp.copy()
+        for (x, y), color in Game.tmp.items():
+            Game.balls_layer.blit(balls[color], (x - beta, y - beta))
+            if Game.tmpy >= screen.bottom - 200:
+                tmplen = len(Game.tmp)
+                for (x, y), color in Game.dropcopy.items():
+                    print "printing x, y in Game.tmp"
+                    print Game.tmp
+                    print x, y
+                    Game.tmp.pop((x, y))
+                    tmplen -= 1
+                    Game.balls_layer.blit(applies_alpha(hole, bg.subsurface(x - beta, y - beta, gamma, gamma)),
+                                      (x - beta, y - beta))
+                Animation.remove(Game.drop)
+                break
+        for (x, y), color in Game.d.items():
+            Game.balls_layer.blit(balls[color], (x - beta, y - beta))
+
+        Game.tmpy += 10
 
 def game_mainloop():
     mouse.set_visible(0)
@@ -269,14 +307,14 @@ def game_mainloop():
         Game.pause = False
     while True:
         ev = event.poll()                               # polls for mouse and keyboard events
-        if ev.type == KEYDOWN and ev.key == K_ESCAPE:   # pauses game when esc pressed
+        if ev.type == KEYDOWN and ev.key == K_ESCAPE:   # hitting escape key pauses the game
             Game.pause_resume()
             mouse.set_visible(1)
             break
-        elif ev.type == QUIT:                           # exits games when quit typed and enter pressed
+        elif ev.type == QUIT:  # quit the game
             quit()
             exit()
-        elif ev.type == MOUSEMOTION:
+        elif ev.type == MOUSEMOTION:  # move mouse
             Arrow.update(ev.pos, eta)
         Game.update()
         if Game.status in (2, 3):
@@ -316,14 +354,13 @@ class Ball(Rect):
             if self.cmp == 10:
                 Animation.remove(self.appears)
                 Animation.add(self.rebour)
-                self.cmprebour = 0
+                self.cmprebour = 0  # change this number to change the timer on the ball
                 self.time = 0
                 return
             self.time = 0
 
-    def rebour(self):
+    def rebour(self):                       # action when clicking mouse to fire ball
         if mouse.get_pressed()[0]:
-            print "shooting"
             self.shot = 1000 * self.cmprebour - self.time
             self.cmprebour = 1
             self.time = 1000
@@ -343,22 +380,22 @@ class Ball(Rect):
     def move(self):
         r = self.copy()
         r.center = self.px + self.vx, self.py + self.vy
-        if r.top >= screen.bottom:                          # checks if ball touches bottom of screen is so you lose
+        if r.top >= screen.bottom:                      # checks if ball touches bottom of screen is so you lose
             Game.ball.lost = True
             Animation.remove(self.move)
             return
-        if r.right > screen.right:                          # redirects ball if ball hits right wall
+        if r.right > screen.right:                      # redirects ball if ball hits right wall
             self.px, self.py = screen.right - beta, self.centery + (
             (r.centery - self.centery) / (r.centerx - self.centerx)) * (screen.right - beta - self.centerx)
             self.vx = -self.vx
-        elif r.left < screen.left:                          # redirects ball if ball hits left wall
+        elif r.left < screen.left:                      # redirects ball if ball hits left wall
             self.px, self.py = beta, self.centery + ((r.centery - self.centery) / (r.centerx - self.centerx)) * (
             beta - self.centerx)
             self.vx = -self.vx
         else:
             self.px += self.vx
             self.py += self.vy
-        if r.top <= 0:                                      # positions ball if touches top of screen
+        if r.top <= 0:                                  # positions ball if touches top of screen
             self.px, self.py = self.centerx + ((r.centerx - self.centerx) / (r.centery - self.centery)) * (
             beta - self.centery), beta
             if self.px < beta:
@@ -383,20 +420,26 @@ class Ball(Rect):
                 self.center = min(g, key=lambda p: (self.centerx - p[0]) ** 2 + (self.centery - p[1]) ** 2)
                 self.fix = True
                 break
-        if self.fix: Animation.remove(self.move)
+        if self.fix:
+            print self.px, self.py
+            Animation.remove(self.move)
 
 
 class Animation:
     methods = []
 
     @staticmethod
-    def update(): [method() for method in Animation.methods]
+    def update():
+        [method() for method in Animation.methods]
 
     @staticmethod
-    def add(method): Animation.methods.append(method)
+    def add(method):
+        Animation.methods.append(method)
 
     @staticmethod
-    def remove(method): Animation.methods.remove(method)
+    def remove(method):
+        Animation.methods.remove(method)
 
     @staticmethod
-    def clear(): Animation.methods = []
+    def clear():
+        Animation.methods = []
