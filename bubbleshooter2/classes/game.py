@@ -7,6 +7,7 @@ class Game:
     Animclock = time.Clock()
     newlinerclock = time.Clock()
     rendertime = 0
+    rendertime = 0
     Animtime = 0
     # newlinertime = 0
     parite = 1
@@ -276,12 +277,12 @@ class Game:
     def drop():
         print "in drop"
         Game.balls_layer.set_alpha(255)
-        Game.tmp = dict([((x, y + 10), color) for (x, y), color in Game.tmp.items()])
+        Game.tmp = dict([((x, y + 5), color) for (x, y), color in Game.tmp.items()])
         Game.balls_layer.blit(bg, screen)
         Game.dropcopy = Game.tmp.copy()
         for (x, y), color in Game.tmp.items():
             Game.balls_layer.blit(balls[color], (x - beta, y - beta))
-            if Game.tmpy >= screen.bottom - 200:
+            while Game.tmpy >= screen.bottom - 200:
                 tmplen = len(Game.tmp)
                 for (x, y), color in Game.dropcopy.items():
                     print "printing x, y in Game.tmp"
@@ -289,14 +290,13 @@ class Game:
                     print x, y
                     Game.tmp.pop((x, y))
                     tmplen -= 1
-                    Game.balls_layer.blit(applies_alpha(hole, bg.subsurface(x - beta, y - beta, gamma, gamma)),
-                                      (x - beta, y - beta))
+                    Game.balls_layer.blit(applies_alpha(hole, bg.subsurface(x - beta, y - beta, gamma, gamma)),(x - beta, y - beta))
                 Animation.remove(Game.drop)
                 break
         for (x, y), color in Game.d.items():
             Game.balls_layer.blit(balls[color], (x - beta, y - beta))
 
-        Game.tmpy += 10
+        Game.tmpy += 5
 
 def game_mainloop():
     mouse.set_visible(0)
