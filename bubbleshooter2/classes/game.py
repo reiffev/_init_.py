@@ -282,7 +282,7 @@ class Game:
         Game.dropcopy = Game.tmp.copy()
         for (x, y), color in Game.tmp.items():
             Game.balls_layer.blit(balls[color], (x - beta, y - beta))
-            while Game.tmpy >= screen.bottom - 200:
+            if Game.tmpy >= screen.bottom - 200:
                 tmplen = len(Game.tmp)
                 for (x, y), color in Game.dropcopy.items():
                     print "printing x, y in Game.tmp"
@@ -290,7 +290,8 @@ class Game:
                     print x, y
                     Game.tmp.pop((x, y))
                     tmplen -= 1
-                    Game.balls_layer.blit(applies_alpha(hole, bg.subsurface(x - beta, y - beta, gamma, gamma)),(x - beta, y - beta))
+                    Game.balls_layer.blit(applies_alpha(hole, bg.subsurface(x - beta, y - beta, gamma, gamma)),
+                                      (x - beta, y - beta))
                 Animation.remove(Game.drop)
                 break
         for (x, y), color in Game.d.items():
@@ -361,10 +362,10 @@ class Ball(Rect):
 
     def rebour(self):                       # action when clicking mouse to fire ball
         if mouse.get_pressed()[0]:
-            self.shot = 1000 * self.cmprebour - self.time
+            # self.shot = 1000 * self.cmprebour - self.time
             self.cmprebour = 1
             self.time = 1000
-        self.time += self.clock.tick()
+        # self.time += self.clock.tick()
         if self.time >= 1000:
             self.cmprebour -= 1
             if not self.cmprebour:
@@ -375,7 +376,7 @@ class Ball(Rect):
                     y = eta
                 angle = atan2(y - self.centery, x - self.centerx)
                 self.vx, self.vy = cos(angle) * 1.5, sin(angle) * 1.5
-            self.time = 0
+            # self.time = 0
 
     def move(self):
         r = self.copy()
