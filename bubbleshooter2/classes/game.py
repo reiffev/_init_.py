@@ -277,7 +277,7 @@ class Game:
     def drop():
         print "in drop"
         Game.balls_layer.set_alpha(255)
-        Game.tmp = dict([((x, y + 10), color) for (x, y), color in Game.tmp.items()])
+        Game.tmp = dict([((x, y + 3), color) for (x, y), color in Game.tmp.items()])
         Game.balls_layer.blit(bg, screen)
         Game.dropcopy = Game.tmp.copy()
         for (x, y), color in Game.tmp.items():
@@ -297,7 +297,7 @@ class Game:
         for (x, y), color in Game.d.items():
             Game.balls_layer.blit(balls[color], (x - beta, y - beta))
 
-        Game.tmpy += 10
+        Game.tmpy += 3
 
 def game_mainloop():
     mouse.set_visible(0)
