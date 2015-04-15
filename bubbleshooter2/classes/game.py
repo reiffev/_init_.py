@@ -6,9 +6,11 @@ class Game:
     renderclock = time.Clock()
     Animclock = time.Clock()
     newlinerclock = time.Clock()
+    moveClock = time.Clock()
     rendertime = 0
     rendertime = 0
     Animtime = 0
+    moveTime = 0
     # newlinertime = 0
     parite = 1
     colorqueue=deque()
@@ -32,6 +34,7 @@ class Game:
         Game.balls_layer.set_alpha(100)
         Game.status = 0
         Game.colors_count = {'red': 0, 'blu': 0, 'yel': 0, 'gre': 0, 'pur': 0, 'bla': 0}   # colors list and count
+        Game.pos = {}                           #tuples with images displayed.
         Game.d = {}                             # list of tuples of all the existing grid points with balls on them. Contains keys that come from l
         Game.l = []                             # tuple of ball just fired. if connected to same color it appends the other balls to it.
         Game.l0 = []                            # ball location x, y appended from l[0] so it can apply star3.png
@@ -49,6 +52,7 @@ class Game:
             for x, y in level[0]:
                 color = Game.choice_color()
                 Game.d[(x, y)] = color
+                Game.pos[(x, y)] = color
                 Game.colors_count[color] += 1
                 Game.balls_layer.blit(balls[color], (x - beta, y - beta))
             for x, y in level[1]:
@@ -130,6 +134,7 @@ class Game:
                         print "adding Game.drop"
                         Animation.add(Game.drop)
                     print "adding Game.plop"
+                    Game.pos = Game.d.copy()
                     Animation.add(Game.plop)
                 elif Game.ball.bottom > eta:
                     Game.status = 1
@@ -224,19 +229,39 @@ class Game:
             nextcolorpos= label.get_rect(bottomleft=screen.move(5,-110).bottomleft)
             scr.blit(balls[Game.colorqueue[0]],label.get_rect(bottomleft=screen.move(105,-120).bottomleft))
             scr.blit(nextcolor,nextcolorpos)
-
             display.flip()
             Game.rendertime = 0
             return True
+
+    @staticmethod 
+    def updatePos():                            # Updates Graphic
+        Game.moveTime += Game.moveClock.tick()
+        if Game.moveTime >= 400:
+            for(x,y), ipos in Game.pos.items():
+                if ipos == 'red':
+                    Game.balls_layer.blit(test[ipos], (x - beta, y - beta))
+                    Game.pos[(x,y)] = 'one'
+                elif ipos == 'one':
+                    Game.balls_layer.blit(test[ipos], (x - beta, y - beta))
+                    Game.pos[(x,y)] = 'two'
+                elif ipos == 'two':
+                    Game.balls_layer.blit(test[ipos], (x - beta, y - beta))
+                    Game.pos[(x,y)] = 'three'
+                elif ipos == 'three':
+                    Game.balls_layer.blit(test[ipos], (x - beta, y - beta))
+                    Game.pos[(x,y)] = 'red'
+            Game.moveTime = 0
 
     @staticmethod
     def addline(n=1):                                   # adds line when newliner called
         Game.balls_layer.set_alpha(255)
         for n in range(n):
             Game.d = dict([((x, y + alpha), color) for (x, y), color in Game.d.items()])
+            Game.pos = dict([((x, y + alpha), ipos) for (x, y), ipos in Game.pos.items()])
             for x in range(beta * Game.parite + beta, screen.w, gamma):
                 color = Game.choice_color()
                 Game.d[(x, beta)] = color
+                Game.pos[(x, beta)] = color
                 Game.colors_count[color] += 1
             Game.parite ^= 1
         Game.dkeys = set(Game.d.keys())
@@ -318,6 +343,7 @@ def game_mainloop():
         elif ev.type == MOUSEMOTION:  # move mouse
             Arrow.update(ev.pos, eta)
         Game.update()
+        Game.updatePos()
         if Game.status in (2, 3):
             break
         Animation.update()
@@ -333,8 +359,10 @@ class Ball(Rect):
         self.cmp = 0
         self.cmprebour = 0
         self.clock = time.Clock()
+        self.ipos = 'one'
         self.time = 500
         Animation.add(self.appears)
+        Animation.add(self.motion)
         self.fix = False
         self.lost = False
         self.shot = 0
@@ -378,6 +406,23 @@ class Ball(Rect):
                 self.vx, self.vy = cos(angle) * 1.5, sin(angle) * 1.5
             # self.time = 0
 
+    def motion(self):
+        if self.color == 'red':
+            self.time += self.clock.tick()
+            if self.time >= 400:
+                if self.ipos == 'red':
+                    self.img = transform.scale(balls[self.ipos], self.size)
+                    self.ipos = 'one'
+                else:
+                    self.img = transform.scale(test[self.ipos], self.size)
+                    if self.ipos == 'one':
+                        self.ipos = 'two'
+                    elif self.ipos == 'two':
+                        self.ipos = 'three'
+                    elif self.ipos == 'three':
+                        self.ipos = 'red'
+                self.time = 0
+    
     def move(self):
         r = self.copy()
         r.center = self.px + self.vx, self.py + self.vy

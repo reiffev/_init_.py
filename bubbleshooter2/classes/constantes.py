@@ -14,7 +14,12 @@ star3 = image.load('res/plop3.png')
 mainclock = time.Clock()
 
 
-balls = {   'red':image.load('res/bubblerougetest.png'),
+test = {    'one':image.load('res/testChar1.png'), 
+            'two':image.load('res/testChar2.png'), 
+            'three':image.load('res/testChar3.png'),
+            'red':image.load('res/testChar2.png')   }
+
+balls = {   'red':test['red'],
             'blu':image.load('res/bubblebleutest.png'),
             'yel':image.load('res/bubblejaunetest.png'),
             'gre':image.load('res/bubbleverttest.png'),
