@@ -83,10 +83,11 @@ class Game:
             elif Game.ball.fix:
                 Game.balls_layer.blit(Game.ball.img, Game.ball)
                 Game.d[Game.ball.center] = Game.ball.color
+                Game.pos = Game.d.copy();
                 l = [Game.ball.center]                                 # adds position of ball on grid to array l <- [(x,y)]
                 Game.tmp = {}
-                print Game.dkeys                                # Game.dkeys
-                print l
+                #print Game.dkeys                                # Game.dkeys
+                #print l
                 for X, Y in l:                                  # checks for surrounding balls
                     for x, y in ((-gamma, 0), (-beta, -alpha), (beta, -alpha), (gamma, 0), (-beta, alpha), (beta, alpha)):
                         # ((-40, 0), (-20, -34), (20, -34), (40, 0), (-20, 34), (20,34))
@@ -94,12 +95,12 @@ class Game:
                         # x = 20; y = 34
                         if (X + x, Y + y) in Game.d and Game.d[(X + x, Y + y)] == Game.ball.color and (X + x, Y + y) not in l:
                                 l.append((X + x, Y + y))        # appends new position into l if not in already
-                                print "printing l"
+                                """print "printing l"
                                 print l
                                 print "printing Game.l0"
                                 print Game.l0
                                 print "printing Game.l1"
-                                print Game.l1
+                                print Game.l1"""
                 if len(l) >= 3:                                 # checks if there is a color length combo >= 3
                     Game.scoreN = 2                             # Game.scoreN is overall game score. Need to fix totaling
                     for x, y in l:
@@ -130,12 +131,18 @@ class Game:
                     Game.l.extend(m.keys())
                     if not Game.colors_count:
                         Game.status = 1
+                    #print "UPDATE BEFORE"
+                    #print Animation.methods
                     if m:
-                        print "adding Game.drop"
+                        #print "adding Game.drop"
                         Animation.add(Game.drop)
-                    print "adding Game.plop"
+                    #print "adding Game.plop"
+                    #print "UPDATE AFTER"
+                    #print Animation.methods
                     Game.pos = Game.d.copy()
                     Animation.add(Game.plop)
+                    #while Animation.methods.__contains__(Game.plop): THIS WORKS (in the sense that it prints). POSSIBLE WAY TO FIX BUG
+                        #print "here"
                 elif Game.ball.bottom > eta:
                     Game.status = 1
                 Game.dkeys = set(Game.d.keys())
@@ -176,6 +183,8 @@ class Game:
     # provides the animation for each ball explosion
     @staticmethod
     def plop():
+        #print "PLOP"
+        #print Animation.methods
         Game.Animtime += Game.Animclock.tick()
         if Game.Animtime >= 80:
             if Game.l1:                 # applies animation of hole and removes from the list
@@ -193,8 +202,8 @@ class Game:
                 Game.balls_layer.blit(applies_alpha(star1, bg.subsurface(x - beta, y - beta, gamma, gamma)),
                                       (x - beta, y - beta))
                 Game.l0.append((x, y))
-                print "printing x, y in l"
-                print x, y
+                #print "printing x, y in l"
+                #print x, y
 
                 Game.scoreN -= 1
                 if Game.scoreN < 0:
@@ -300,7 +309,9 @@ class Game:
 
     @staticmethod
     def drop():
-        print "in drop"
+        #print "in drop"
+        #print "DROP"
+        #print Animation.methods
         Game.balls_layer.set_alpha(255)
         Game.tmp = dict([((x, y + 3), color) for (x, y), color in Game.tmp.items()])
         Game.balls_layer.blit(bg, screen)
@@ -310,9 +321,9 @@ class Game:
             if Game.tmpy >= screen.bottom - 200:
                 tmplen = len(Game.tmp)
                 for (x, y), color in Game.dropcopy.items():
-                    print "printing x, y in Game.tmp"
-                    print Game.tmp
-                    print x, y
+                    #print "printing x, y in Game.tmp"
+                    #print Game.tmp
+                    #print x, y
                     Game.tmp.pop((x, y))
                     tmplen -= 1
                     Game.balls_layer.blit(applies_alpha(hole, bg.subsurface(x - beta, y - beta, gamma, gamma)),
@@ -467,7 +478,7 @@ class Ball(Rect):
                 self.fix = True
                 break
         if self.fix:
-            print self.px, self.py
+            #print self.px, self.py
             Animation.remove(self.move)
 
 
