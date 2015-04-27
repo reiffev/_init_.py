@@ -87,7 +87,7 @@ while True:
         if not resume: Game.init()
         else: resume = False
         mixer.music.load('res/Dungeon9.ogg')
-        mixer.music.play(-1, 0.0)
+        mixer.play(-1, 0.0)
         game_mainloop()
         if Game.status == 2: save_hightscore('Classic')
         if Game.status in (2,3): endmess()
